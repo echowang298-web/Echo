@@ -1,2 +1,12 @@
 .DS_Store
 *.log
+
+# 本地归档 & 状态文件（不进公网）
+逐字稿归档/
+.sync_state/
+逐字稿_*.md
+
+# python
+__pycache__/
+*.pyc
+.venv/

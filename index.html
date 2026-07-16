@@ -88,6 +88,10 @@
 
             <div class="pt-4 mt-4 border-t border-slate-800">
                 <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">演示操作</p>
+                <button onclick="manualSync()" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-orange-400 hover:bg-slate-900 transition">
+                    <span class="text-lg">⚡</span>
+                    <span>立即同步会议</span>
+                </button>
                 <button onclick="syncSummaryDemo()" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900 transition">
                     <span class="text-lg">🔄</span>
                     <span>同步一份自动总结</span>
@@ -321,10 +325,13 @@
 
         <div class="page" id="page-projects">
             <div class="p-8 space-y-6">
-                <div>
-                    <p class="text-xs uppercase tracking-[0.2em] text-orange-500 font-bold">Projects</p>
-                    <h2 class="text-3xl font-black text-slate-900 mt-1">项目进度</h2>
-                    <p class="text-sm text-slate-500 mt-2">每个项目都有阶段、摘要、时间轴和可勾选的子任务，适合老板查进度，也适合你自己推进。</p>
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.2em] text-orange-500 font-bold">Projects</p>
+                        <h2 class="text-3xl font-black text-slate-900 mt-1">项目进度</h2>
+                        <p class="text-sm text-slate-500 mt-2">每个项目都有阶段、摘要、时间轴和可勾选的子任务，适合老板查进度，也适合你自己推进。</p>
+                    </div>
+                    <button onclick="openAddProjectModal()" class="self-start md:self-auto px-4 py-2.5 rounded-xl bg-orange-500 text-white text-sm font-bold hover:bg-orange-600 transition shadow-soft">+ 新增项目</button>
                 </div>
                 <div class="space-y-6" id="projects-container"></div>
             </div>
@@ -446,6 +453,47 @@
         </div>
     </div>
 
+    <div id="add-project-modal" class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-lg bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-xl font-black text-slate-900">新增项目</h3>
+                    <p class="text-sm text-slate-500 mt-1">先把你正在跟的项目录进来，自动同步会议时才能把待办挂到正确项目下。</p>
+                </div>
+                <button onclick="closeAddProjectModal()" class="text-slate-400 hover:text-slate-600 text-xl">×</button>
+            </div>
+            <div class="mt-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">项目名称 *</label>
+                    <input id="new-project-name" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="例如：订单与发票功能">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">简介 / 关键词（可选，帮助 AI 匹配同步待办）</label>
+                    <textarea id="new-project-summary" rows="2" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="例如：负责协调开发、测试、验收；关键词：发票、退款、退票"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">状态</label>
+                        <select id="new-project-status" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <option value="推进中">推进中</option>
+                            <option value="测试中">测试中</option>
+                            <option value="已完成">已完成</option>
+                            <option value="已上线">已上线</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">下一里程碑（可选）</label>
+                        <input id="new-project-milestone" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="例如：本周需求评审">
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="closeAddProjectModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">取消</button>
+                <button onclick="submitNewProject()" class="px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition">确认创建</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="fixed bottom-5 right-5 hidden rounded-2xl bg-slate-900 text-white px-4 py-3 text-sm shadow-soft z-50"></div>
 
     <script>
@@ -473,6 +521,7 @@
                 if (!Array.isArray(parsed.summaryHistory)) parsed.summaryHistory = deepClone(defaultBoard.summaryHistory);
                 if (!Array.isArray(parsed.reportHistory)) parsed.reportHistory = deepClone(defaultBoard.reportHistory);
                 if (!Array.isArray(parsed.projects)) parsed.projects = deepClone(defaultBoard.projects);
+                if (!Array.isArray(parsed.syncedIds)) parsed.syncedIds = [];
                 return parsed;
             } catch (error) {
                 return deepClone(defaultBoard);
@@ -482,6 +531,138 @@
         function saveBoard() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(board));
             renderAll();
+        }
+
+        // ============ 方案 β：服务器同步数据（serverData.json）合并逻辑 ============
+        // 每条 server 数据带 serverSyncId（会议号-类型-序号），前端记住已合并的 id
+        // 保证：只追加、不覆盖、不重复合并
+        async function fetchAndMergeServerData(showToastMsg) {
+            try {
+                const resp = await fetch(`serverData.json?t=${Date.now()}`, { cache: 'no-store' });
+                if (!resp.ok) {
+                    if (showToastMsg) showToast('尚未有服务器同步数据');
+                    return { added: 0 };
+                }
+                const server = await resp.json();
+                if (!Array.isArray(board.syncedIds)) board.syncedIds = [];
+                let added = 0;
+
+                // 0. 追加 projects（服务器建议的项目 seed；本地已存在则不覆盖）
+                (server.projects || []).forEach(p => {
+                    if (!p.id || board.projects.some(existing => existing.id === p.id)) return;
+                    board.projects.push({
+                        id: p.id,
+                        name: p.name,
+                        status: p.status || '推进中',
+                        owner: p.owner || '',
+                        timeline: p.timeline || '',
+                        nextMilestone: p.nextMilestone || '',
+                        summary: p.summary || '',
+                        highlights: p.highlights || [],
+                        tasks: [],
+                        keywords: p.keywords || []
+                    });
+                    added++;
+                });
+
+                // 1. 追加 summaryHistory
+                (server.summaryHistory || []).forEach(item => {
+                    if (item.serverSyncId && board.syncedIds.includes(item.serverSyncId)) return;
+                    board.summaryHistory.unshift(item);
+                    if (item.serverSyncId) board.syncedIds.push(item.serverSyncId);
+                    added++;
+                });
+
+                // 项目匹配辅助：先按名字包含 → 再按 keywords
+                const matchProject = (hint) => {
+                    if (!hint) return null;
+                    let m = board.projects.find(p =>
+                        p.name.includes(hint) || hint.includes(p.name)
+                    );
+                    if (m) return m;
+                    m = board.projects.find(p =>
+                        Array.isArray(p.keywords) && p.keywords.some(k => hint.includes(k) || k.includes(hint))
+                    );
+                    return m || null;
+                };
+
+                // 2. 追加 inspires（要匹配已有项目）
+                (server.inspires || []).forEach(item => {
+                    if (item.serverSyncId && board.syncedIds.includes(item.serverSyncId)) return;
+                    let projectId = item.projectId;
+                    if (!projectId && item.projectHint) {
+                        const matched = matchProject(item.projectHint);
+                        projectId = matched ? matched.id : null;
+                    }
+                    board.inspires.push({
+                        id: item.id || `insp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                        projectId: projectId,
+                        text: item.text,
+                        source: item.source || '会议逐字稿',
+                        serverSyncId: item.serverSyncId,
+                        addedTaskId: null
+                    });
+                    if (item.serverSyncId) board.syncedIds.push(item.serverSyncId);
+                    added++;
+                });
+
+                // 3. 追加 project.tasks（追加到已有项目；匹配不上则挂"未归类"项目）
+                let orphan = board.projects.find(p => p.id === '__orphan__');
+                (server.tasks || []).forEach(item => {
+                    if (item.serverSyncId && board.syncedIds.includes(item.serverSyncId)) return;
+                    let targetProject = null;
+                    if (item.projectId) {
+                        targetProject = board.projects.find(p => p.id === item.projectId);
+                    }
+                    if (!targetProject && item.projectHint) {
+                        targetProject = matchProject(item.projectHint);
+                    }
+                    if (!targetProject) {
+                        if (!orphan) {
+                            orphan = {
+                                id: '__orphan__',
+                                name: '未归类（会议同步）',
+                                status: '推进中',
+                                owner: '待归类',
+                                timeline: '--',
+                                nextMilestone: '将下方待办分派到具体项目',
+                                summary: '会议逐字稿中提取但未能匹配到已有项目的待办，会自动进这里；你可以手动挪到具体项目。',
+                                highlights: [],
+                                tasks: []
+                            };
+                            board.projects.push(orphan);
+                        }
+                        targetProject = orphan;
+                    }
+                    targetProject.tasks.unshift({
+                        id: item.id || `task-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                        text: item.text,
+                        completed: false,
+                        priority: item.priority || '中',
+                        quadrant: item.quadrant || 'important-not-urgent',
+                        source: item.source || 'meeting',
+                        serverSyncId: item.serverSyncId
+                    });
+                    if (item.serverSyncId) board.syncedIds.push(item.serverSyncId);
+                    added++;
+                });
+
+                if (added > 0) {
+                    saveBoard();
+                    if (showToastMsg) showToast(`已同步 ${added} 条新数据（来自会议逐字稿）`);
+                } else if (showToastMsg) {
+                    showToast('暂无新的会议同步数据');
+                }
+                return { added };
+            } catch (err) {
+                console.warn('serverData 合并失败:', err);
+                if (showToastMsg) showToast('服务器数据加载失败');
+                return { added: 0, error: err };
+            }
+        }
+
+        function manualSync() {
+            fetchAndMergeServerData(true);
         }
 
         function escapeHtml(value) {
@@ -1058,6 +1239,45 @@
             document.getElementById('add-task-modal').classList.add('hidden');
         }
 
+        function openAddProjectModal() {
+            document.getElementById('add-project-modal').classList.remove('hidden');
+            document.getElementById('add-project-modal').classList.add('flex');
+            document.getElementById('new-project-name').focus();
+        }
+
+        function closeAddProjectModal() {
+            document.getElementById('add-project-modal').classList.add('hidden');
+            document.getElementById('new-project-name').value = '';
+            document.getElementById('new-project-summary').value = '';
+            document.getElementById('new-project-milestone').value = '';
+        }
+
+        function submitNewProject() {
+            const name = document.getElementById('new-project-name').value.trim();
+            const summary = document.getElementById('new-project-summary').value.trim();
+            const status = document.getElementById('new-project-status').value;
+            const milestone = document.getElementById('new-project-milestone').value.trim();
+            if (!name) {
+                showToast('请填写项目名称');
+                return;
+            }
+            const id = `proj-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+            board.projects.push({
+                id,
+                name,
+                status,
+                owner: '',
+                timeline: '',
+                nextMilestone: milestone,
+                summary,
+                highlights: [],
+                tasks: []
+            });
+            closeAddProjectModal();
+            saveBoard();
+            showToast(`项目「${name}」已创建`);
+        }
+
         function submitNewTask() {
             const desc = document.getElementById('new-task-desc').value.trim();
             const projectId = document.getElementById('new-task-project').value;
@@ -1253,6 +1473,8 @@
         }
 
         renderAll();
+        // 启动时静默拉取一次服务器数据（不弹 toast，避免打扰）
+        fetchAndMergeServerData(false);
     </script>
 </body>
 </html>
