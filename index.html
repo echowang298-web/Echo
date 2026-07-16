@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作提效看板 · 自动总结接入版 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c'
+                        }
+                    },
+                    boxShadow: {
+                        soft: '0 10px 30px rgba(15, 23, 42, 0.08)'
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        .page { display: none; }
+        .page.active { display: block; }
+        .nav-item.active {
+            background: linear-gradient(90deg, #ea580c, #f59e0b);
+            color: white;
+            box-shadow: 0 10px 30px rgba(234, 88, 12, 0.22);
+        }
+        .nav-item.active .nav-icon { color: white; }
+        .glass {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(14px);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans h-screen overflow-hidden flex">
+    <aside class="w-72 bg-slate-950 text-white flex flex-col shrink-0">
+        <div class="px-5 py-5 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-400 flex items-center justify-center text-xl shadow-lg">⚡</div>
+                <div>
+                    <h1 class="text-sm font-bold tracking-wide">工作提效看板</h1>
+                    <p class="text-[11px] text-slate-400 mt-0.5">自动总结接入版 Demo</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">看板模块</p>
+
+            <button onclick="switchPage('dashboard')" data-page="dashboard" class="nav-item active w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900 transition">
+                <span class="nav-icon text-lg">🗂️</span>
+                <span>总览看板</span>
+            </button>
+            <button onclick="switchPage('summary')" data-page="summary" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900 transition">
+                <span class="nav-icon text-lg">🧠</span>
+                <span>自动总结留痕</span>
+            </button>
+            <button onclick="switchPage('quadrant')" data-page="quadrant" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900 transition">
+                <span class="nav-icon text-lg">🎯</span>
+                <span>四象限待办</span>
+            </button>
+            <button onclick="switchPage('inspire')" data-page="inspire" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900 transition">
+                <span class="nav-icon text-lg">💡</span>
+                <span>会议 Inspire</span>
+            </button>
+            <button onclick="switchPage('projects')" data-page="projects" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900 transition">
+                <span class="nav-icon text-lg">📁</span>
+                <span>项目进度</span>
+            </button>
+            <button onclick="switchPage('report')" data-page="report" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900 transition">
+                <span class="nav-icon text-lg">📝</span>
+                <span>日报时间轴</span>
+            </button>
+            <button onclick="switchPage('bot')" data-page="bot" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900 transition">
+                <span class="nav-icon text-lg">🤖</span>
+                <span>企微智能助手</span>
+            </button>
+
+            <div class="pt-4 mt-4 border-t border-slate-800">
+                <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">演示操作</p>
+                <button onclick="syncSummaryDemo()" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900 transition">
+                    <span class="text-lg">🔄</span>
+                    <span>同步一份自动总结</span>
+                </button>
+                <button onclick="resetBoard()" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-900 transition">
+                    <span class="text-lg">♻️</span>
+                    <span>重置 Demo 数据</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="px-5 py-4 border-t border-slate-800">
+            <div class="flex items-center justify-between text-[11px] text-slate-400">
+                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>本地留痕已开启</span>
+                <span id="sidebar-sync-time">--</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto">
+        <div class="page active" id="page-dashboard">
+            <div class="p-8 space-y-8">
+                <div class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.2em] text-orange-500 font-bold">Overview</p>
+                        <h2 class="text-3xl font-black text-slate-900 mt-1">总览看板</h2>
+                        <p class="text-sm text-slate-500 mt-2">把企业微信自动总结拆成项目进度、待办与日报留痕，而不是整段堆文档。</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="syncSummaryDemo()" class="px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl shadow-soft transition">同步自动总结</button>
+                        <button onclick="switchPage('summary')" class="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl border border-slate-200 transition">查看留痕页</button>
+                    </div>
+                </div>
+
+                <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-soft">
+                        <p class="text-xs font-semibold text-slate-400">自动总结已同步</p>
+                        <p class="mt-2 text-3xl font-black text-slate-900" id="metric-summary-count">0</p>
+                        <p class="text-xs text-slate-500 mt-2">保存在留痕时间轴中，可追溯每次同步。</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-soft">
+                        <p class="text-xs font-semibold text-emerald-500">已完成事项</p>
+                        <p class="mt-2 text-3xl font-black text-emerald-600" id="metric-completed-count">0</p>
+                        <p class="text-xs text-slate-500 mt-2">来自自动总结拆解 + 看板任务完成状态。</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-soft">
+                        <p class="text-xs font-semibold text-rose-500">高优先级待办</p>
+                        <p class="mt-2 text-3xl font-black text-rose-600" id="metric-priority-count">0</p>
+                        <p class="text-xs text-slate-500 mt-2">优先给你和老板看到最该盯的事。</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-soft">
+                        <p class="text-xs font-semibold text-amber-500">进行中项目</p>
+                        <p class="mt-2 text-3xl font-black text-amber-600" id="metric-active-projects">0</p>
+                        <p class="text-xs text-slate-500 mt-2">按项目维度看当前推进状态。</p>
+                    </div>
+                </section>
+
+                <section class="grid grid-cols-1 2xl:grid-cols-3 gap-6">
+                    <div class="2xl:col-span-2 space-y-6">
+                        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="text-xs uppercase tracking-[0.2em] text-slate-400 font-bold">Latest Sync</p>
+                                    <h3 class="text-xl font-black text-slate-900 mt-2">本次自动总结拆解</h3>
+                                    <p class="text-sm text-slate-500 mt-1">最新一份企业微信自动总结，已被拆成“完成事项 / 待办 / 项目状态”。</p>
+                                </div>
+                                <div class="rounded-2xl bg-orange-50 border border-orange-100 px-4 py-3 min-w-[180px]">
+                                    <p class="text-[11px] text-orange-500 font-semibold">最近同步时间</p>
+                                    <p class="text-sm font-bold text-orange-700 mt-1" id="latest-summary-time">--</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-sm font-bold text-slate-900">工作成果</h4>
+                                        <span class="text-[11px] px-2 py-1 rounded-full bg-emerald-100 text-emerald-700" id="latest-summary-completed-badge">0 条</span>
+                                    </div>
+                                    <div class="mt-3 space-y-3" id="latest-summary-completed"></div>
+                                </div>
+                                <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-sm font-bold text-slate-900">待推进事项</h4>
+                                        <span class="text-[11px] px-2 py-1 rounded-full bg-rose-100 text-rose-700" id="latest-summary-todo-badge">0 条</span>
+                                    </div>
+                                    <div class="mt-3 space-y-3" id="latest-summary-todos"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
+                            <div class="flex items-center justify-between gap-4">
+                                <div>
+                                    <h3 class="text-xl font-black text-slate-900">项目速览</h3>
+                                    <p class="text-sm text-slate-500 mt-1">自动总结里的内容，不是原文直贴，而是进入项目卡片和进度条。</p>
+                                </div>
+                                <button onclick="switchPage('projects')" class="text-sm font-semibold text-orange-600 hover:text-orange-700">查看完整项目页 →</button>
+                            </div>
+                            <div class="mt-5 grid grid-cols-1 xl:grid-cols-2 gap-4" id="overview-project-cards"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-slate-900 text-white rounded-3xl p-6 shadow-soft">
+                            <p class="text-xs uppercase tracking-[0.2em] text-orange-300 font-bold">Today Focus</p>
+                            <h3 class="text-xl font-black mt-2">今天先盯这几件</h3>
+                            <div class="mt-4 space-y-3" id="overview-focus-list"></div>
+                        </div>
+
+                        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
+                            <h3 class="text-lg font-black text-slate-900">接入路径</h3>
+                            <div class="mt-4 space-y-3 text-sm text-slate-600">
+                                <div class="rounded-2xl bg-orange-50 border border-orange-100 p-4">
+                                    <p class="font-semibold text-orange-700">1. 企业微信自动总结落到固定文档</p>
+                                    <p class="text-xs mt-1 text-orange-600">已验证 `doc.weixin.qq.com` 可读取。</p>
+                                </div>
+                                <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                                    <p class="font-semibold text-slate-800">2. 定时同步文档并结构化解析</p>
+                                    <p class="text-xs mt-1 text-slate-500">抽出项目、进度、待办、风险与原始留痕。</p>
+                                </div>
+                                <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                                    <p class="font-semibold text-slate-800">3. 结果同步进看板与日报时间轴</p>
+                                    <p class="text-xs mt-1 text-slate-500">老板问进度时，机器人直接读结构化结果。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="page" id="page-summary">
+            <div class="p-8 space-y-8">
+                <div class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.2em] text-orange-500 font-bold">Summary Feed</p>
+                        <h2 class="text-3xl font-black text-slate-900 mt-1">自动总结留痕</h2>
+                        <p class="text-sm text-slate-500 mt-2">这里保留每次同步的原始快照，既能追溯，也能做 AI 二次结构化。</p>
+                    </div>
+                    <button onclick="syncSummaryDemo()" class="px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl shadow-soft transition">再同步一份演示数据</button>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div class="xl:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-400">当前来源</p>
+                                <h3 class="text-xl font-black text-slate-900 mt-2" id="summary-source-title">--</h3>
+                                <p class="text-sm text-slate-500 mt-1" id="summary-source-desc">--</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[11px] text-slate-400">最近同步</p>
+                                <p class="text-sm font-bold text-slate-900 mt-1" id="summary-source-time">--</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                            <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-4">
+                                <h4 class="text-sm font-bold text-emerald-800">完成事项抽取</h4>
+                                <div class="mt-3 space-y-3" id="summary-finished-list"></div>
+                            </div>
+                            <div class="rounded-2xl bg-rose-50 border border-rose-100 p-4">
+                                <h4 class="text-sm font-bold text-rose-800">待办事项抽取</h4>
+                                <div class="mt-3 space-y-3" id="summary-pending-list"></div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                            <div class="flex items-center justify-between gap-3">
+                                <h4 class="text-sm font-bold text-slate-900">原始总结快照</h4>
+                                <span class="text-[11px] px-2 py-1 rounded-full bg-slate-200 text-slate-600">固定文档输入源</span>
+                            </div>
+                            <div class="mt-3 text-sm text-slate-600 leading-7 whitespace-pre-line max-h-[320px] overflow-y-auto" id="summary-raw-content"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
+                            <h3 class="text-lg font-black text-slate-900">本次 AI 结论</h3>
+                            <div class="mt-4 space-y-3" id="summary-insights"></div>
+                        </div>
+                        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
+                            <h3 class="text-lg font-black text-slate-900">同步时间轴</h3>
+                            <div class="mt-4 space-y-4" id="summary-history-timeline"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page-quadrant">
+            <div class="p-8 space-y-6">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.2em] text-orange-500 font-bold">Task Matrix</p>
+                        <h2 class="text-3xl font-black text-slate-900 mt-1">四象限待办</h2>
+                        <p class="text-sm text-slate-500 mt-2">自动总结抽出的待办，已经按优先级和项目落入四象限。</p>
+                    </div>
+                    <button onclick="openAddTaskModal()" class="px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl shadow-soft transition">+ 新增任务</button>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-5" id="quadrant-grid"></div>
+            </div>
+        </div>
+
+        <div class="page" id="page-inspire">
+            <div class="p-8 space-y-6">
+                <div class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.2em] text-orange-500 font-bold">Meeting Inspire</p>
+                        <h2 class="text-3xl font-black text-slate-900 mt-1">会议 Inspire</h2>
+                        <p class="text-sm text-slate-500 mt-2">从会议逐字稿里提取对项目有启发的点，按项目归类。点「加入项目」会变成该项目一条 <span class="text-orange-600 font-semibold">⭐ Inspire 待办</span>，再点 ⭐ 可循环切换优先级。</p>
+                    </div>
+                    <div class="rounded-2xl bg-orange-50 border border-orange-100 px-4 py-3 min-w-[160px]">
+                        <p class="text-[11px] text-orange-500 font-semibold">已提取 Inspire</p>
+                        <p class="text-2xl font-black text-orange-700 mt-1"><span id="inspire-total">0</span> 条 · 已加入 <span id="inspire-added">0</span></p>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl bg-slate-900 text-white px-5 py-4 flex flex-wrap items-center gap-3">
+                    <span class="text-lg">🎤</span>
+                    <div class="text-sm">
+                        <span class="font-bold">本期来源：</span><span id="inspire-source-label">暂无逐字稿来源，等待下一次同步</span>
+                    </div>
+                    <span class="ml-auto text-[11px] px-2 py-1 rounded-full bg-white/10 border border-white/10" id="inspire-source-tags">识别专题：--</span>
+                </div>
+
+                <div class="space-y-6" id="inspire-container"></div>
+            </div>
+        </div>
+
+        <div class="page" id="page-projects">
+            <div class="p-8 space-y-6">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.2em] text-orange-500 font-bold">Projects</p>
+                    <h2 class="text-3xl font-black text-slate-900 mt-1">项目进度</h2>
+                    <p class="text-sm text-slate-500 mt-2">每个项目都有阶段、摘要、时间轴和可勾选的子任务，适合老板查进度，也适合你自己推进。</p>
+                </div>
+                <div class="space-y-6" id="projects-container"></div>
+            </div>
+        </div>
+
+        <div class="page" id="page-report">
+            <div class="p-8 space-y-6">
+                <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.2em] text-orange-500 font-bold">Daily Report</p>
+                        <h2 class="text-3xl font-black text-slate-900 mt-1">日报时间轴</h2>
+                        <p class="text-sm text-slate-500 mt-2">演示你之前提过的三段式结构：今天完成 / 待办事项 / 复盘与思考，并做留痕。</p>
+                    </div>
+                    <button onclick="generateDailyReport()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-soft transition">生成并留存一份日报</button>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div class="xl:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
+                        <div class="flex items-center justify-between gap-4">
+                            <h3 class="text-xl font-black text-slate-900">本次日报预览</h3>
+                            <button onclick="copyLatestReport()" class="px-3 py-1.5 text-xs font-semibold text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-50 transition">复制文本</button>
+                        </div>
+                        <textarea id="report-preview" readonly class="mt-4 w-full h-[440px] rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-700 focus:outline-none"></textarea>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
+                        <h3 class="text-lg font-black text-slate-900">日报留痕时间轴</h3>
+                        <div class="mt-4 space-y-4" id="report-history-timeline"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page-bot">
+            <div class="p-8 space-y-6">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.2em] text-orange-500 font-bold">Assistant</p>
+                    <h2 class="text-3xl font-black text-slate-900 mt-1">企微智能助手</h2>
+                    <p class="text-sm text-slate-500 mt-2">机器人不需要背原文，它直接读结构化结果：项目状态、紧急待办、自动总结同步时间。</p>
+                </div>
+
+                <div class="max-w-4xl bg-white rounded-3xl border border-slate-200 shadow-soft flex flex-col h-[640px] overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white text-xl">🤖</div>
+                        <div>
+                            <p class="text-sm font-black text-slate-900">提效助手</p>
+                            <p class="text-xs text-emerald-500">在线 · 已接入自动总结 Demo 数据</p>
+                        </div>
+                    </div>
+
+                    <div id="chat-messages" class="flex-1 overflow-y-auto bg-slate-50 p-5 space-y-4 text-sm">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-blue-500 text-white flex items-center justify-center shrink-0">🤖</div>
+                            <div class="bg-white border border-slate-200 rounded-2xl px-4 py-3 max-w-[80%] shadow-sm text-slate-700">你好，我已经接入“企业微信自动总结”这条数据源了。你可以问我今天最该盯什么、老板要的项目进度、或者最近一次总结有没有同步成功。</div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-100 bg-white">
+                        <div class="px-5 pt-4 flex flex-wrap gap-2">
+                            <button onclick="simulateAsk('我今天还有什么没做？')" class="px-3 py-2 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition">我今天还有什么没做？</button>
+                            <button onclick="simulateAsk('项目进度怎么样？')" class="px-3 py-2 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition">项目进度概览</button>
+                            <button onclick="simulateAsk('自动总结同步到了吗？')" class="px-3 py-2 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition">自动总结同步到了吗？</button>
+                            <button onclick="simulateAsk('本周 Inspire 有哪些？')" class="px-3 py-2 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition">本周 Inspire</button>
+                        </div>
+                        <div class="px-5 py-4 flex items-center gap-2">
+                            <input id="chat-input" type="text" placeholder="给提效助手发消息，例如：项目进度怎么样？"
+                                onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatInput();}"
+                                class="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition">
+                            <button onclick="sendChatInput()" class="shrink-0 px-4 py-3 rounded-2xl bg-orange-500 text-white text-sm font-bold hover:bg-orange-600 transition">发送</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="add-task-modal" class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-lg bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-xl font-black text-slate-900">新增看板任务</h3>
+                    <p class="text-sm text-slate-500 mt-1">演示：你手动补充任务后，也会自动落入项目和四象限。</p>
+                </div>
+                <button onclick="closeAddTaskModal()" class="text-slate-400 hover:text-slate-600 text-xl">×</button>
+            </div>
+            <div class="mt-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">任务描述</label>
+                    <input id="new-task-desc" type="text" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="例如：跟进本周关键任务">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">关联项目</label>
+                        <select id="new-task-project" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">四象限</label>
+                        <select id="new-task-quadrant" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <option value="urgent-important">🔥 紧急且重要</option>
+                            <option value="important-not-urgent">⏳ 重要不紧急</option>
+                            <option value="urgent-not-important">⚡️ 紧急不重要</option>
+                            <option value="not-urgent-important">🌱 不重要不紧急</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">优先级</label>
+                    <select id="new-task-priority" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="高">高</option>
+                        <option value="中">中</option>
+                        <option value="低">低</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="closeAddTaskModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">取消</button>
+                <button onclick="submitNewTask()" class="px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition">确认添加</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 hidden rounded-2xl bg-slate-900 text-white px-4 py-3 text-sm shadow-soft z-50"></div>
+
+    <script>
+        const STORAGE_KEY = 'wecom_efficiency_demo_v5';
+
+        const defaultBoard = {
+            summaryHistory: [],
+            inspires: [],
+            reportHistory: [],
+            projects: []
+        };
+
+        let board = loadBoard();
+
+        function deepClone(value) {
+            return JSON.parse(JSON.stringify(value));
+        }
+
+        function loadBoard() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return deepClone(defaultBoard);
+            try {
+                const parsed = JSON.parse(saved);
+                if (!Array.isArray(parsed.inspires)) parsed.inspires = deepClone(defaultBoard.inspires);
+                if (!Array.isArray(parsed.summaryHistory)) parsed.summaryHistory = deepClone(defaultBoard.summaryHistory);
+                if (!Array.isArray(parsed.reportHistory)) parsed.reportHistory = deepClone(defaultBoard.reportHistory);
+                if (!Array.isArray(parsed.projects)) parsed.projects = deepClone(defaultBoard.projects);
+                return parsed;
+            } catch (error) {
+                return deepClone(defaultBoard);
+            }
+        }
+
+        function saveBoard() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(board));
+            renderAll();
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function nowText() {
+            const now = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        }
+
+        function getAllTasks() {
+            return board.projects.flatMap(project => project.tasks.map(task => ({ ...task, projectId: project.id, projectName: project.name, projectStatus: project.status })));
+        }
+
+        function getQuadrants() {
+            const map = {
+                'urgent-important': { title: '🔥 紧急且重要', description: '马上推进，今天优先盯紧', color: 'rose' },
+                'important-not-urgent': { title: '⏳ 重要不紧急', description: '需要排期，避免拖成火烧眉毛', color: 'amber' },
+                'urgent-not-important': { title: '⚡️ 紧急不重要', description: '快速处理，避免占用太多精力', color: 'blue' },
+                'not-urgent-important': { title: '🌱 不重要不紧急', description: '低频推进，适合卡位储备', color: 'slate' }
+            };
+            const groups = {
+                'urgent-important': [],
+                'important-not-urgent': [],
+                'urgent-not-important': [],
+                'not-urgent-important': []
+            };
+
+            getAllTasks().forEach(task => {
+                if (groups[task.quadrant]) groups[task.quadrant].push(task);
+            });
+
+            return Object.keys(groups).map(key => ({ key, ...map[key], tasks: groups[key] }));
+        }
+
+        function getProgress(project) {
+            const total = project.tasks.length;
+            const done = project.tasks.filter(task => task.completed).length;
+            return { total, done, percent: total === 0 ? 0 : Math.round((done / total) * 100) };
+        }
+
+        function getStatusBadge(status) {
+            const map = {
+                '已上线': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                '已完成': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                '推进中': 'bg-blue-100 text-blue-700 border-blue-200',
+                '测试中': 'bg-amber-100 text-amber-700 border-amber-200'
+            };
+            return map[status] || 'bg-slate-100 text-slate-700 border-slate-200';
+        }
+
+        function getPriorityBadge(priority) {
+            const map = {
+                '高': 'bg-rose-100 text-rose-700',
+                '中': 'bg-amber-100 text-amber-700',
+                '低': 'bg-slate-200 text-slate-700'
+            };
+            return map[priority] || 'bg-slate-200 text-slate-700';
+        }
+
+        function getLatestSummary() {
+            return board.summaryHistory[0];
+        }
+
+        function switchPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            const targetPage = document.getElementById(`page-${pageName}`);
+            const targetNav = document.querySelector(`.nav-item[data-page="${pageName}"]`);
+            if (targetPage) targetPage.classList.add('active');
+            if (targetNav) targetNav.classList.add('active');
+        }
+
+        function renderSidebarStatus() {
+            const latestSummary = getLatestSummary();
+            document.getElementById('sidebar-sync-time').textContent = latestSummary ? latestSummary.syncedAt.slice(5) : '--';
+        }
+
+        function renderOverview() {
+            const tasks = getAllTasks();
+            const latestSummary = getLatestSummary();
+            const completedCount = tasks.filter(task => task.completed).length;
+            const priorityCount = tasks.filter(task => !task.completed && task.priority === '高').length;
+            const activeProjectCount = board.projects.filter(project => !['已完成', '已上线'].includes(project.status)).length;
+            document.getElementById('metric-summary-count').textContent = board.summaryHistory.length;
+            document.getElementById('metric-completed-count').textContent = completedCount;
+            document.getElementById('metric-priority-count').textContent = priorityCount;
+            document.getElementById('metric-active-projects').textContent = activeProjectCount;
+            document.getElementById('latest-summary-time').textContent = latestSummary ? latestSummary.syncedAt : '--';
+            document.getElementById('latest-summary-completed-badge').textContent = `${latestSummary ? latestSummary.completedItems.length : 0} 条`;
+            document.getElementById('latest-summary-todo-badge').textContent = `${latestSummary ? latestSummary.todoItems.length : 0} 条`;
+
+            const completedContainer = document.getElementById('latest-summary-completed');
+            const emptyBlock = '<div class="rounded-2xl bg-white border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-400">暂无自动总结数据，可去「自动总结留痕」页手动同步一份，或等待下一次企微自动总结推送。</div>';
+            completedContainer.innerHTML = latestSummary && latestSummary.completedItems.length > 0
+                ? latestSummary.completedItems.map(item => `
+                <div class="rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm text-slate-700 leading-6">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs mr-2">✓</span>${escapeHtml(item)}
+                </div>
+            `).join('') : emptyBlock;
+
+            const todoContainer = document.getElementById('latest-summary-todos');
+            todoContainer.innerHTML = latestSummary && latestSummary.todoItems.length > 0
+                ? latestSummary.todoItems.map(item => `
+                <div class="rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm text-slate-700 leading-6">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rose-100 text-rose-700 text-xs mr-2">!</span>${escapeHtml(item)}
+                </div>
+            `).join('') : emptyBlock;
+
+            const focusContainer = document.getElementById('overview-focus-list');
+            const focusTasks = getAllTasks().filter(task => !task.completed && task.quadrant === 'urgent-important');
+            focusContainer.innerHTML = focusTasks.length === 0
+                ? '<div class="rounded-2xl bg-white/10 border border-white/10 px-4 py-4 text-sm text-slate-200">今天的紧急重要事项都清空了，可以开始处理重要不紧急的项目。</div>'
+                : focusTasks.map(task => `
+                    <div class="rounded-2xl bg-white/10 border border-white/10 px-4 py-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-semibold text-white">${escapeHtml(task.text)}</p>
+                                <p class="text-xs text-slate-300 mt-1">项目：${escapeHtml(task.projectName)}</p>
+                            </div>
+                            <span class="px-2 py-1 rounded-full text-[11px] font-semibold bg-rose-200/20 text-rose-100">${escapeHtml(task.priority)}</span>
+                        </div>
+                    </div>
+                `).join('');
+
+            const projectCards = document.getElementById('overview-project-cards');
+            projectCards.innerHTML = board.projects.length === 0
+                ? '<div class="col-span-full rounded-3xl bg-slate-50 border border-dashed border-slate-300 p-8 text-center text-sm text-slate-400">暂无项目。可在「项目进度」页点右上角「+ 新增项目」开始录入。</div>'
+                : board.projects.map(project => {
+                    const progress = getProgress(project);
+                    return `
+                    <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h4 class="text-base font-black text-slate-900">${escapeHtml(project.name)}</h4>
+                                    <span class="text-[11px] px-2 py-1 rounded-full border ${getStatusBadge(project.status)}">${escapeHtml(project.status)}</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-2">${escapeHtml(project.summary || '')}</p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <p class="text-2xl font-black text-orange-600">${progress.percent}%</p>
+                                <p class="text-[11px] text-slate-400">${progress.done}/${progress.total}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 h-2 rounded-full bg-slate-200 overflow-hidden">
+                            <div class="h-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400" style="width:${progress.percent}%"></div>
+                        </div>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            ${(project.highlights || []).map(tag => `<span class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-[11px] text-slate-600">${escapeHtml(tag)}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+                }).join('');
+        }
+
+        function renderSummaryPage() {
+            const latestSummary = getLatestSummary();
+            const emptyBlock = '<div class="rounded-2xl bg-white border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-400">暂无内容</div>';
+
+            document.getElementById('summary-source-title').textContent = latestSummary ? latestSummary.title : '暂无自动总结';
+            document.getElementById('summary-source-desc').textContent = latestSummary ? latestSummary.description : '还没有任何自动总结数据，可以点侧栏「🔄 同步一份自动总结」按钮生成一份 Demo 数据，或等待下一次企业微信自动总结推送。';
+            document.getElementById('summary-source-time').textContent = latestSummary ? latestSummary.syncedAt : '--';
+            document.getElementById('summary-raw-content').textContent = latestSummary ? latestSummary.rawContent : '（暂无原文）';
+
+            document.getElementById('summary-finished-list').innerHTML = latestSummary && latestSummary.completedItems.length > 0
+                ? latestSummary.completedItems.map(item => `
+                    <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100 text-sm text-emerald-900 leading-6">${escapeHtml(item)}</div>
+                `).join('')
+                : emptyBlock;
+
+            document.getElementById('summary-pending-list').innerHTML = latestSummary && latestSummary.todoItems.length > 0
+                ? latestSummary.todoItems.map(item => `
+                    <div class="rounded-2xl bg-white px-4 py-3 border border-rose-100 text-sm text-rose-900 leading-6">${escapeHtml(item)}</div>
+                `).join('')
+                : emptyBlock;
+
+            document.getElementById('summary-insights').innerHTML = latestSummary && (latestSummary.insights || []).length > 0
+                ? latestSummary.insights.map((item, index) => `
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4 text-sm text-slate-700 leading-6">
+                        <p class="text-xs font-bold text-orange-500 mb-2">结论 ${index + 1}</p>
+                        ${escapeHtml(item)}
+                    </div>
+                `).join('')
+                : emptyBlock;
+
+            document.getElementById('summary-history-timeline').innerHTML = board.summaryHistory.length === 0
+                ? emptyBlock
+                : board.summaryHistory.map((item, index) => `
+                    <div class="relative pl-6">
+                        <span class="absolute left-0 top-1.5 w-3 h-3 rounded-full ${index === 0 ? 'bg-orange-500' : 'bg-slate-300'}"></span>
+                        ${index !== board.summaryHistory.length - 1 ? '<span class="absolute left-[5px] top-5 bottom-[-18px] w-px bg-slate-200"></span>' : ''}
+                        <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                            <p class="text-xs font-semibold text-slate-400">${escapeHtml(item.syncedAt)}</p>
+                            <p class="text-sm font-bold text-slate-900 mt-1">${escapeHtml(item.title)}</p>
+                            <p class="text-xs text-slate-500 mt-1">完成 ${item.completedItems.length} 条 · 待办 ${item.todoItems.length} 条</p>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function renderQuadrants() {
+            const quadrantGrid = document.getElementById('quadrant-grid');
+            quadrantGrid.innerHTML = getQuadrants().map(group => {
+                const colorMap = {
+                    rose: 'bg-rose-50 border-rose-100',
+                    amber: 'bg-amber-50 border-amber-100',
+                    blue: 'bg-blue-50 border-blue-100',
+                    slate: 'bg-slate-100 border-slate-200'
+                };
+                const badgeMap = {
+                    rose: 'bg-rose-100 text-rose-700',
+                    amber: 'bg-amber-100 text-amber-700',
+                    blue: 'bg-blue-100 text-blue-700',
+                    slate: 'bg-slate-200 text-slate-700'
+                };
+                return `
+                    <div class="rounded-3xl border p-5 ${colorMap[group.color]}">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold ${badgeMap[group.color]}">${group.title}</span>
+                                <p class="text-sm text-slate-500 mt-3">${group.description}</p>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-500">${group.tasks.length} 项</span>
+                        </div>
+                        <div class="mt-5 space-y-3 min-h-[220px]">
+                            ${group.tasks.length === 0 ? '<div class="h-full rounded-2xl border border-dashed border-slate-300 bg-white/60 px-4 py-8 text-center text-sm text-slate-400">当前没有任务</div>' : group.tasks.map(task => `
+                                <div class="rounded-2xl bg-white border border-white/80 px-4 py-3 shadow-sm">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <label class="flex items-start gap-3 flex-1 cursor-pointer">
+                                            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskStatus('${escapeHtml(task.projectId)}','${escapeHtml(task.id)}')" class="mt-0.5 w-4 h-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500">
+                                            <div>
+                                                <p class="text-sm font-semibold ${task.completed ? 'line-through text-slate-400' : 'text-slate-800'}">
+                                                    ${task.source === 'inspire' ? inspireStarButton(task.projectId, task.id, task.priority) + ' ' : ''}${escapeHtml(task.text)}
+                                                </p>
+                                                <p class="text-xs text-slate-500 mt-1">${escapeHtml(task.projectName)}${task.source === 'inspire' ? ' · <span class="text-orange-500 font-semibold">Inspire</span>' : ''}</p>
+                                            </div>
+                                        </label>
+                                        <div class="flex flex-col items-end gap-2 shrink-0">
+                                            <span class="px-2 py-1 rounded-full text-[11px] font-semibold ${getPriorityBadge(task.priority)}">${escapeHtml(task.priority)}</span>
+                                            <button onclick="deleteTask('${escapeHtml(task.projectId)}','${escapeHtml(task.id)}')" class="text-xs text-slate-400 hover:text-rose-500 transition">删除</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderProjects() {
+            const container = document.getElementById('projects-container');
+            if (board.projects.length === 0) {
+                container.innerHTML = '<div class="rounded-3xl bg-white border border-dashed border-slate-300 p-10 text-center text-sm text-slate-400">当前还没有项目。可点右上角「+ 新增任务」按钮先添加任务时创建项目，或等待自动总结同步后自动生成项目卡片。</div>';
+                return;
+            }
+            container.innerHTML = board.projects.map(project => {
+                const progress = getProgress(project);
+                return `
+                    <section class="bg-white rounded-3xl border border-slate-200 p-6 shadow-soft">
+                        <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-5">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 flex-wrap">
+                                    <h3 class="text-2xl font-black text-slate-900">${escapeHtml(project.name)}</h3>
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold border ${getStatusBadge(project.status)}">${escapeHtml(project.status)}</span>
+                                </div>
+                                <p class="text-sm text-slate-500 mt-3 leading-7">${escapeHtml(project.summary)}</p>
+                                <div class="mt-4 flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs">👥 ${escapeHtml(project.owner)}</span>
+                                    <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs">🗓️ ${escapeHtml(project.timeline)}</span>
+                                    <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs">🎯 ${escapeHtml(project.nextMilestone)}</span>
+                                </div>
+                            </div>
+                            <div class="w-full xl:w-64 rounded-3xl bg-slate-50 border border-slate-200 p-5 shrink-0">
+                                <p class="text-xs text-slate-400 font-semibold">当前进度</p>
+                                <div class="flex items-end justify-between gap-3 mt-3">
+                                    <p class="text-4xl font-black text-orange-600">${progress.percent}%</p>
+                                    <p class="text-xs text-slate-500">${progress.done}/${progress.total} 已完成</p>
+                                </div>
+                                <div class="mt-3 h-2 rounded-full bg-slate-200 overflow-hidden">
+                                    <div class="h-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400" style="width:${progress.percent}%"></div>
+                                </div>
+                                <div class="mt-4 flex flex-wrap gap-2">
+                                    ${project.highlights.map(item => `<span class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-[11px] text-slate-600">${escapeHtml(item)}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 grid grid-cols-1 xl:grid-cols-2 gap-6">
+                            <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                                <h4 class="text-sm font-bold text-slate-900">时间轴 / 关键节点</h4>
+                                <div class="mt-4 space-y-3">
+                                    <div class="relative pl-6">
+                                        <span class="absolute left-0 top-1.5 w-3 h-3 rounded-full bg-orange-500"></span>
+                                        <div>
+                                            <p class="text-sm font-semibold text-slate-900">当前阶段：${escapeHtml(project.status)}</p>
+                                            <p class="text-xs text-slate-500 mt-1">${escapeHtml(project.timeline)}</p>
+                                        </div>
+                                    </div>
+                                    <div class="relative pl-6">
+                                        <span class="absolute left-0 top-1.5 w-3 h-3 rounded-full bg-slate-300"></span>
+                                        <div>
+                                            <p class="text-sm font-semibold text-slate-900">下一关键节点</p>
+                                            <p class="text-xs text-slate-500 mt-1">${escapeHtml(project.nextMilestone)}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                                <div class="flex items-center justify-between gap-4">
+                                    <h4 class="text-sm font-bold text-slate-900">项目任务</h4>
+                                    <span class="text-xs text-slate-500">可直接勾选推进</span>
+                                </div>
+                                <div class="mt-4 space-y-3">
+                                    ${project.tasks.map(task => `
+                                        <div class="rounded-2xl bg-white border ${task.source === 'inspire' ? 'border-orange-200' : 'border-slate-200'} px-4 py-3">
+                                            <div class="flex items-start justify-between gap-3">
+                                                <label class="flex items-start gap-3 flex-1 cursor-pointer">
+                                                    <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskStatus('${escapeHtml(project.id)}','${escapeHtml(task.id)}')" class="mt-0.5 w-4 h-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500">
+                                                    <div>
+                                                        <p class="text-sm font-semibold ${task.completed ? 'line-through text-slate-400' : 'text-slate-800'}">
+                                                            ${task.source === 'inspire' ? inspireStarButton(project.id, task.id, task.priority) + ' ' : ''}${escapeHtml(task.text)}
+                                                        </p>
+                                                        <p class="text-xs text-slate-500 mt-1">四象限：${escapeHtml(task.quadrant)}${task.source === 'inspire' ? ' · <span class="text-orange-500 font-semibold">Inspire</span>' : ''}</p>
+                                                    </div>
+                                                </label>
+                                                <span class="px-2 py-1 rounded-full text-[11px] font-semibold ${getPriorityBadge(task.priority)}">${escapeHtml(task.priority)}</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }).join('');
+        }
+
+        function renderReports() {
+            const preview = document.getElementById('report-preview');
+            const latest = board.reportHistory[0];
+            if (latest) {
+                preview.value = formatReportText(latest);
+            } else {
+                preview.value = '点击“生成并留存一份日报”后，会在这里出现日报预览。';
+            }
+
+            document.getElementById('report-history-timeline').innerHTML = board.reportHistory.map((report, index) => `
+                <div class="relative pl-6">
+                    <span class="absolute left-0 top-1.5 w-3 h-3 rounded-full ${index === 0 ? 'bg-emerald-500' : 'bg-slate-300'}"></span>
+                    ${index !== board.reportHistory.length - 1 ? '<span class="absolute left-[5px] top-5 bottom-[-18px] w-px bg-slate-200"></span>' : ''}
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                        <p class="text-xs font-semibold text-slate-400">${escapeHtml(report.generatedAt)}</p>
+                        <p class="text-sm font-bold text-slate-900 mt-1">完成 ${report.completed.length} 条 · 待办 ${report.todos.length} 条</p>
+                        <p class="text-xs text-slate-500 mt-2 leading-6">${escapeHtml(report.reflection)}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProjectOptions() {
+            const select = document.getElementById('new-task-project');
+            select.innerHTML = board.projects.length === 0
+                ? '<option value="" disabled selected>暂无项目，请先在「项目进度」页新增项目</option>'
+                : board.projects.map(project => `<option value="${escapeHtml(project.id)}">${escapeHtml(project.name)}</option>`).join('');
+        }
+
+        function renderAll() {
+            renderSidebarStatus();
+            renderOverview();
+            renderSummaryPage();
+            renderQuadrants();
+            renderInspire();
+            renderProjects();
+            renderReports();
+            renderProjectOptions();
+        }
+
+        function getInspireStarClass(priority) {
+            const map = {
+                '高': 'text-rose-500',
+                '中': 'text-amber-500',
+                '低': 'text-slate-300'
+            };
+            return map[priority] || 'text-amber-500';
+        }
+
+        function inspireStarButton(projectId, taskId, priority) {
+            const cls = getInspireStarClass(priority);
+            const title = `Inspire 待办 · 当前优先级：${priority}（点击切换 高→中→低）`;
+            return `<button onclick="cycleInspirePriority('${escapeHtml(projectId)}','${escapeHtml(taskId)}')" title="${title}" class="text-base leading-none ${cls} hover:scale-110 transition transform">★</button>`;
+        }
+
+        function cycleInspirePriority(projectId, taskId) {
+            const project = board.projects.find(item => item.id === projectId);
+            if (!project) return;
+            const task = project.tasks.find(item => item.id === taskId);
+            if (!task) return;
+            const order = ['高', '中', '低'];
+            const idx = order.indexOf(task.priority);
+            task.priority = order[(idx + 1) % order.length];
+            saveBoard();
+            showToast(`已切换 Inspire 优先级为「${task.priority}」`);
+        }
+
+        function renderInspire() {
+            const container = document.getElementById('inspire-container');
+            const inspires = board.inspires || [];
+            const total = inspires.length;
+            const added = inspires.filter(item => item.addedTaskId).length;
+            const totalEl = document.getElementById('inspire-total');
+            const addedEl = document.getElementById('inspire-added');
+            if (totalEl) totalEl.textContent = total;
+            if (addedEl) addedEl.textContent = added;
+
+            const sourceLabelEl = document.getElementById('inspire-source-label');
+            const sourceTagsEl = document.getElementById('inspire-source-tags');
+            if (sourceLabelEl && sourceTagsEl) {
+                if (total === 0) {
+                    sourceLabelEl.textContent = '暂无逐字稿来源，等待下一次同步';
+                    sourceTagsEl.textContent = '识别专题：--';
+                } else {
+                    const sources = [...new Set(inspires.map(it => it.source).filter(Boolean))];
+                    const projectNames = [...new Set(inspires.map(it => {
+                        const p = board.projects.find(pp => pp.id === it.projectId);
+                        return p ? p.name : null;
+                    }).filter(Boolean))];
+                    sourceLabelEl.textContent = sources.length > 0 ? sources.join(' / ') : '会议逐字稿';
+                    sourceTagsEl.textContent = '识别专题：' + (projectNames.length > 0 ? projectNames.join(' · ') : '--');
+                }
+            }
+
+            if (!container) return;
+            if (total === 0) {
+                container.innerHTML = '<div class="rounded-3xl bg-white border border-dashed border-slate-300 p-10 text-center text-sm text-slate-400">当前还没有 Inspire 点，等下一次同步会议逐字稿后会自动生成。</div>';
+                return;
+            }
+
+            const groups = board.projects.map(project => ({
+                project,
+                items: inspires.filter(item => item.projectId === project.id)
+            })).filter(group => group.items.length > 0);
+
+            const orphan = inspires.filter(item => !board.projects.some(project => project.id === item.projectId));
+            if (orphan.length > 0) {
+                groups.push({
+                    project: { id: '__orphan__', name: '未归类', status: '待归类', summary: '暂时没匹配到项目的 Inspire 点，可以后续手动归入项目。' },
+                    items: orphan
+                });
+            }
+
+            container.innerHTML = groups.map(group => {
+                const project = group.project;
+                const badge = getStatusBadge(project.status);
+                return `
+                    <section class="bg-white rounded-3xl border border-slate-200 p-6 shadow-soft">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h3 class="text-lg font-black text-slate-900">${escapeHtml(project.name)}</h3>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${badge}">${escapeHtml(project.status)}</span>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-orange-50 text-orange-600 border border-orange-100">${group.items.length} 个 Inspire</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-2 leading-6">${escapeHtml(project.summary || '')}</p>
+                            </div>
+                            ${project.id !== '__orphan__' ? `<button onclick="switchPage('projects')" class="text-xs font-semibold text-orange-600 hover:text-orange-700 self-start md:self-auto">跳到项目页 →</button>` : ''}
+                        </div>
+
+                        <div class="mt-4 grid grid-cols-1 xl:grid-cols-2 gap-4">
+                            ${group.items.map(item => {
+                                const added = !!item.addedTaskId;
+                                let addedTask = null;
+                                if (added) {
+                                    const p = board.projects.find(pp => pp.id === item.projectId);
+                                    if (p) addedTask = p.tasks.find(t => t.id === item.addedTaskId);
+                                }
+                                return `
+                                    <div class="rounded-2xl bg-slate-50 border ${added ? 'border-emerald-200' : 'border-slate-200'} p-4">
+                                        <div class="flex items-start gap-3">
+                                            <span class="text-lg leading-none ${added && addedTask ? getInspireStarClass(addedTask.priority) : 'text-amber-500'}">★</span>
+                                            <div class="flex-1">
+                                                <p class="text-sm text-slate-800 leading-6">${escapeHtml(item.text)}</p>
+                                                <p class="text-[11px] text-slate-400 mt-2">来源：${escapeHtml(item.source || '会议逐字稿')}</p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex items-center justify-between gap-3 flex-wrap">
+                                            ${added && addedTask ? `
+                                                <span class="text-[11px] px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">✓ 已加入项目待办（当前：${escapeHtml(addedTask.priority)}）</span>
+                                                <div class="flex items-center gap-2">
+                                                    <button onclick="removeInspireFromProject('${escapeHtml(item.id)}')" class="text-[11px] font-semibold text-slate-400 hover:text-rose-500 transition">撤销</button>
+                                                    <button onclick="deleteInspire('${escapeHtml(item.id)}')" title="删除该 Inspire" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition">🗑 删除</button>
+                                                </div>
+                                            ` : `
+                                                <span class="text-[11px] text-slate-400">尚未加入项目待办</span>
+                                                <div class="flex items-center gap-2">
+                                                    <button onclick="deleteInspire('${escapeHtml(item.id)}')" title="删除该 Inspire" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 transition">🗑 删除</button>
+                                                    <button onclick="addInspireToProject('${escapeHtml(item.id)}')" ${project.id === '__orphan__' ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg text-xs font-semibold ${project.id === '__orphan__' ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-orange-500 text-white hover:bg-orange-600'} transition">加入项目 ★</button>
+                                                </div>
+                                            `}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </section>
+                `;
+            }).join('');
+        }
+
+        function addInspireToProject(inspireId) {
+            const inspire = (board.inspires || []).find(item => item.id === inspireId);
+            if (!inspire) return;
+            const project = board.projects.find(item => item.id === inspire.projectId);
+            if (!project) {
+                showToast('该 Inspire 未匹配到项目，无法加入');
+                return;
+            }
+            const taskId = `inspire-${Date.now()}`;
+            project.tasks.unshift({
+                id: taskId,
+                text: inspire.text,
+                completed: false,
+                priority: '中',
+                quadrant: 'important-not-urgent',
+                source: 'inspire'
+            });
+            inspire.addedTaskId = taskId;
+            saveBoard();
+            showToast('已加入项目待办（点 ★ 可切换优先级）');
+        }
+
+        function deleteInspire(inspireId) {
+            const inspires = board.inspires || [];
+            const inspire = inspires.find(item => item.id === inspireId);
+            if (!inspire) return;
+            if (!confirm('确认删除这条 Inspire？如果已加入项目，对应待办也会一并移除。')) return;
+            if (inspire.addedTaskId) {
+                const project = board.projects.find(item => item.id === inspire.projectId);
+                if (project) {
+                    project.tasks = project.tasks.filter(task => task.id !== inspire.addedTaskId);
+                }
+            }
+            board.inspires = inspires.filter(item => item.id !== inspireId);
+            saveBoard();
+            showToast('Inspire 已删除');
+        }
+
+        function removeInspireFromProject(inspireId) {
+            const inspire = (board.inspires || []).find(item => item.id === inspireId);
+            if (!inspire || !inspire.addedTaskId) return;
+            const project = board.projects.find(item => item.id === inspire.projectId);
+            if (project) {
+                project.tasks = project.tasks.filter(task => task.id !== inspire.addedTaskId);
+            }
+            inspire.addedTaskId = null;
+            saveBoard();
+            showToast('已从项目待办中撤销');
+        }
+
+        function openAddTaskModal() {
+            document.getElementById('add-task-modal').classList.remove('hidden');
+        }
+
+        function closeAddTaskModal() {
+            document.getElementById('add-task-modal').classList.add('hidden');
+        }
+
+        function submitNewTask() {
+            const desc = document.getElementById('new-task-desc').value.trim();
+            const projectId = document.getElementById('new-task-project').value;
+            const quadrant = document.getElementById('new-task-quadrant').value;
+            const priority = document.getElementById('new-task-priority').value;
+            if (!desc) {
+                showToast('请先填写任务描述');
+                return;
+            }
+            if (!projectId) {
+                showToast('请先在「项目进度」页新增项目');
+                return;
+            }
+            const project = board.projects.find(item => item.id === projectId);
+            if (!project) return;
+            project.tasks.unshift({
+                id: `task-${Date.now()}`,
+                text: desc,
+                completed: false,
+                priority,
+                quadrant
+            });
+            document.getElementById('new-task-desc').value = '';
+            closeAddTaskModal();
+            saveBoard();
+            showToast('任务已加入看板');
+        }
+
+        function toggleTaskStatus(projectId, taskId) {
+            const project = board.projects.find(item => item.id === projectId);
+            if (!project) return;
+            const task = project.tasks.find(item => item.id === taskId);
+            if (!task) return;
+            task.completed = !task.completed;
+            saveBoard();
+        }
+
+        function deleteTask(projectId, taskId) {
+            const project = board.projects.find(item => item.id === projectId);
+            if (!project) return;
+            project.tasks = project.tasks.filter(item => item.id !== taskId);
+            saveBoard();
+            showToast('任务已删除');
+        }
+
+        function syncSummaryDemo() {
+            const now = nowText();
+            const latest = {
+                id: `summary-${Date.now()}`,
+                title: `企业微信自动总结 · ${now}`,
+                description: '来源：企业微信自动总结（手动触发的一次同步占位数据，可作为后续接入真实文档的结构模板）。',
+                syncedAt: now,
+                sourceUrl: '',
+                completedItems: [],
+                todoItems: [],
+                insights: [],
+                rawContent: '（本次同步为空占位；接入真实企微自动总结文档后，将自动填充完成事项、待办与原文。）'
+            };
+            board.summaryHistory.unshift(latest);
+            saveBoard();
+            showToast('已同步一份新的自动总结快照（空结构 · 待接入真实数据）');
+        }
+
+        function resetBoard() {
+            if (!confirm('确定重置当前 Demo 数据吗？')) return;
+            board = deepClone(defaultBoard);
+            saveBoard();
+            showToast('已恢复默认 Demo 数据');
+        }
+
+        function buildReflection() {
+            const urgentPending = getAllTasks().filter(task => !task.completed && task.quadrant === 'urgent-important');
+            const activeProjects = board.projects.filter(project => !['已完成', '已上线'].includes(project.status)).map(project => project.name);
+            if (urgentPending.length === 0) {
+                return `当前没有未完成的“紧急且重要”事项，接下来应把精力转向 ${activeProjects.join('、')} 的排期和闭环。`;
+            }
+            return `当前风险主要集中在 ${urgentPending.map(task => task.text).join('、')}。优先把这些事项清掉，可以显著提升本周交付确定性。`;
+        }
+
+        function generateDailyReport() {
+            const completed = getAllTasks().filter(task => task.completed).map(task => `${task.projectName}：${task.text}`);
+            const todos = getAllTasks().filter(task => !task.completed).slice(0, 6).map(task => `${task.projectName}：${task.text}`);
+            const report = {
+                id: `report-${Date.now()}`,
+                generatedAt: nowText(),
+                completed,
+                todos,
+                reflection: buildReflection()
+            };
+            board.reportHistory.unshift(report);
+            saveBoard();
+            showToast('已生成并留存一份日报');
+        }
+
+        function formatReportText(report) {
+            const completedText = report.completed.length ? report.completed.map(item => `- ${item}`).join('\n') : '- 暂无已完成事项';
+            const todoText = report.todos.length ? report.todos.map(item => `- ${item}`).join('\n') : '- 暂无待办事项';
+            return `【${report.generatedAt} 工作日报】\n\n一、今天完成的事项\n${completedText}\n\n二、待办事项\n${todoText}\n\n三、复盘与思考\n${report.reflection}`;
+        }
+
+        async function copyLatestReport() {
+            const latest = board.reportHistory[0];
+            if (!latest) {
+                showToast('还没有日报可复制');
+                return;
+            }
+            const text = formatReportText(latest);
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast('日报已复制到剪贴板');
+            } catch (error) {
+                const textarea = document.getElementById('report-preview');
+                textarea.select();
+                document.execCommand('copy');
+                showToast('日报已复制到剪贴板');
+            }
+        }
+
+        function sendChatInput() {
+            const input = document.getElementById('chat-input');
+            if (!input) return;
+            const text = (input.value || '').trim();
+            if (!text) return;
+            input.value = '';
+            simulateAsk(text);
+        }
+
+        function simulateAsk(text) {
+            const container = document.getElementById('chat-messages');
+            container.insertAdjacentHTML('beforeend', `
+                <div class="flex items-start justify-end gap-3">
+                    <div class="bg-orange-50 border border-orange-100 rounded-2xl px-4 py-3 max-w-[80%] text-slate-800">${escapeHtml(text)}</div>
+                </div>
+            `);
+            container.scrollTop = container.scrollHeight;
+
+            setTimeout(() => {
+                let reply = '我已收到你的问题。当前 Demo 版本我能回答：今日待办、项目进度、自动总结同步状态、Inspire 摘要。你可以试试这些方向。';
+                if (text.includes('没做') || text.includes('今天')) {
+                    const pending = getAllTasks().filter(task => !task.completed && task.quadrant === 'urgent-important');
+                    reply = pending.length
+                        ? `今天最该盯的还是这 ${pending.length} 项：\n${pending.map((task, index) => `${index + 1}. ${task.projectName} - ${task.text}`).join('\n')}`
+                        : '今天紧急且重要的事项已经清空了，可以转去推进重要不紧急的项目。';
+                } else if (text.includes('进度') || text.includes('项目')) {
+                    if (board.projects.length === 0) {
+                        reply = '当前还没有项目数据，可在「项目进度」页新增，或等待自动总结同步后自动生成。';
+                    } else {
+                        reply = board.projects.map(project => {
+                            const progress = getProgress(project);
+                            return `【${project.name}】\n状态：${project.status}\n进度：${progress.percent}%（${progress.done}/${progress.total}）\n下一步：${project.nextMilestone || '--'}`;
+                        }).join('\n\n');
+                    }
+                } else if (text.includes('同步') || text.includes('总结')) {
+                    const latestSummary = getLatestSummary();
+                    reply = latestSummary
+                        ? `最近一次自动总结已于 ${latestSummary.syncedAt} 同步成功。\n本次共抽取完成事项 ${latestSummary.completedItems.length} 条、待办事项 ${latestSummary.todoItems.length} 条。`
+                        : '当前还没有任何自动总结数据。可以点侧栏「🔄 同步一份自动总结」触发一次，或等待企微推送。';
+                } else if (text.includes('Inspire') || text.includes('inspire') || text.includes('灵感') || text.includes('启发')) {
+                    const inspires = board.inspires || [];
+                    if (inspires.length === 0) {
+                        reply = '当前还没有 Inspire 点，可以在「会议 Inspire」页从最新逐字稿里同步。';
+                    } else {
+                        const added = inspires.filter(item => item.addedTaskId).length;
+                        const groups = {};
+                        inspires.forEach(item => {
+                            const p = board.projects.find(pp => pp.id === item.projectId);
+                            const name = p ? p.name : '未归类';
+                            (groups[name] = groups[name] || []).push(item);
+                        });
+                        const lines = Object.entries(groups).map(([name, list]) => {
+                            const bullets = list.map((it, i) => `  ${i + 1}. ${it.text}${it.addedTaskId ? '（已加入）' : ''}`).join('\n');
+                            return `【${name}】\n${bullets}`;
+                        });
+                        reply = `本期共 ${inspires.length} 条 Inspire，已加入项目 ${added} 条：\n${lines.join('\n\n')}`;
+                    }
+                }
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-blue-500 text-white flex items-center justify-center shrink-0">🤖</div>
+                        <div class="bg-white border border-slate-200 rounded-2xl px-4 py-3 max-w-[80%] shadow-sm text-slate-700 whitespace-pre-line leading-7">${escapeHtml(reply)}</div>
+                    </div>
+                `);
+                container.scrollTop = container.scrollHeight;
+            }, 450);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            clearTimeout(showToast.timer);
+            showToast.timer = setTimeout(() => toast.classList.add('hidden'), 2200);
+        }
+
+        renderAll();
+    </script>
+</body>
+</html>
