@@ -343,22 +343,26 @@
                     <div>
                         <p class="text-xs uppercase tracking-[0.2em] text-orange-500 font-bold">Daily Report</p>
                         <h2 class="text-3xl font-black text-slate-900 mt-1">日报时间轴</h2>
-                        <p class="text-sm text-slate-500 mt-2">演示你之前提过的三段式结构：今天完成 / 待办事项 / 复盘与思考，并做留痕。</p>
+                        <p class="text-sm text-slate-500 mt-2">左侧可自由编辑；点「确认保存」后，会以今日快照（含各项目进度 %）覆盖到右侧时间轴。同一天多次保存会覆盖上一次。</p>
                     </div>
-                    <button onclick="generateDailyReport()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-soft transition">生成并留存一份日报</button>
                 </div>
 
                 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                     <div class="xl:col-span-2 bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
-                        <div class="flex items-center justify-between gap-4">
-                            <h3 class="text-xl font-black text-slate-900">本次日报预览</h3>
-                            <button onclick="copyLatestReport()" class="px-3 py-1.5 text-xs font-semibold text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-50 transition">复制文本</button>
+                        <div class="flex items-center justify-between gap-4 flex-wrap">
+                            <h3 class="text-xl font-black text-slate-900">本次日报预览（可编辑）</h3>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <button onclick="fillReportDraft()" class="px-3 py-1.5 text-xs font-semibold text-orange-700 border border-orange-200 rounded-lg hover:bg-orange-50 transition">✏️ 生成初稿</button>
+                                <button onclick="copyLatestReport()" class="px-3 py-1.5 text-xs font-semibold text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 transition">复制文本</button>
+                                <button onclick="submitDailyReport()" class="px-4 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition">✅ 确认保存到时间轴</button>
+                            </div>
                         </div>
-                        <textarea id="report-preview" readonly class="mt-4 w-full h-[440px] rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-700 focus:outline-none"></textarea>
+                        <textarea id="report-preview" placeholder="点「✏️ 生成初稿」自动填入今日完成/待办/复盘，也可以直接在这里手写。写完点「✅ 确认保存到时间轴」即可留痕。" class="mt-4 w-full h-[440px] rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition"></textarea>
                     </div>
 
                     <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft">
                         <h3 class="text-lg font-black text-slate-900">日报留痕时间轴</h3>
+                        <p class="text-xs text-slate-400 mt-1">每天一条快照 · 展开可看当时内容</p>
                         <div class="mt-4 space-y-4" id="report-history-timeline"></div>
                     </div>
                 </div>
@@ -497,7 +501,7 @@
     <div id="toast" class="fixed bottom-5 right-5 hidden rounded-2xl bg-slate-900 text-white px-4 py-3 text-sm shadow-soft z-50"></div>
 
     <script>
-        const STORAGE_KEY = 'wecom_efficiency_demo_v5';
+        const STORAGE_KEY = 'wecom_efficiency_demo_v6';
 
         const defaultBoard = {
             summaryHistory: [],
@@ -560,7 +564,8 @@
                         summary: p.summary || '',
                         highlights: p.highlights || [],
                         tasks: [],
-                        keywords: p.keywords || []
+                        keywords: p.keywords || [],
+                        tapdRefs: p.tapdRefs || []
                     });
                     added++;
                 });
@@ -921,14 +926,72 @@
             }).join('');
         }
 
+        // 项目折叠状态（localStorage 持久化）
+        function getProjectCollapsedSet() {
+            try {
+                return new Set(JSON.parse(localStorage.getItem('project_collapsed_v1') || '[]'));
+            } catch (e) { return new Set(); }
+        }
+        function saveProjectCollapsedSet(set) {
+            localStorage.setItem('project_collapsed_v1', JSON.stringify([...set]));
+        }
+        function toggleProjectCollapse(projectId) {
+            const set = getProjectCollapsedSet();
+            const key = `__EXPAND__${projectId}`;
+            if (set.has(key)) set.delete(key);
+            else set.add(key);
+            saveProjectCollapsedSet(set);
+            renderProjects();
+        }
+
         function renderProjects() {
             const container = document.getElementById('projects-container');
             if (board.projects.length === 0) {
                 container.innerHTML = '<div class="rounded-3xl bg-white border border-dashed border-slate-300 p-10 text-center text-sm text-slate-400">当前还没有项目。可点右上角「+ 新增任务」按钮先添加任务时创建项目，或等待自动总结同步后自动生成项目卡片。</div>';
                 return;
             }
+            const collapsedSet = getProjectCollapsedSet();
             container.innerHTML = board.projects.map(project => {
                 const progress = getProgress(project);
+                // 100% 或状态为「已完成/已上线」的项目：默认折叠（除非用户手动展开过）
+                const isFinished = progress.percent === 100 || ['已完成', '已上线'].includes(project.status);
+                // 只有 finished 的项目才允许折叠；折叠状态由 collapsedSet 记录（默认 finished=折叠）
+                const isCollapsed = isFinished && !collapsedSet.has(`__EXPAND__${project.id}`);
+                // 折叠态：显示紧凑卡片
+                if (isCollapsed) {
+                    return `
+                    <section class="bg-white rounded-3xl border border-slate-200 px-5 py-3 shadow-soft opacity-80 hover:opacity-100 transition">
+                        <div class="flex items-center gap-4">
+                            <span class="text-lg">✓</span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h3 class="text-base font-black text-slate-700 truncate">${escapeHtml(project.name)}</h3>
+                                    <span class="px-2 py-0.5 rounded-full text-[11px] font-bold border ${getStatusBadge(project.status)}">${escapeHtml(project.status)}</span>
+                                </div>
+                                <div class="mt-1.5 flex items-center gap-3">
+                                    <div class="flex-1 h-1.5 rounded-full bg-slate-200 overflow-hidden max-w-[280px]">
+                                        <div class="h-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" style="width:${progress.percent}%"></div>
+                                    </div>
+                                    <span class="text-xs font-semibold text-emerald-600">${progress.percent}% <span class="text-slate-400 font-normal">(${progress.done}/${progress.total})</span></span>
+                                </div>
+                            </div>
+                            <button onclick="toggleProjectCollapse('${escapeHtml(project.id)}')" title="展开查看详情" class="shrink-0 text-xs text-slate-400 hover:text-slate-700 px-2 py-1 rounded-lg hover:bg-slate-50 transition">▼ 展开</button>
+                        </div>
+                    </section>`;
+                }
+                // 展开态：完整卡片
+                const collapseButton = isFinished
+                    ? `<button onclick="toggleProjectCollapse('${escapeHtml(project.id)}')" title="收起" class="shrink-0 text-xs text-slate-400 hover:text-slate-700 px-2 py-1 rounded-lg hover:bg-slate-50 transition">▲ 收起</button>`
+                    : '';
+                // TAPD 关联链接
+                const tapdBadges = Array.isArray(project.tapdRefs) && project.tapdRefs.length > 0
+                    ? project.tapdRefs.map(t => `<a href="${escapeHtml(t.url)}" target="_blank" rel="noopener" class="px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-[11px] text-blue-700 hover:bg-blue-100 transition">🔗 TAPD·${escapeHtml(t.title)}${t.status ? ' · ' + escapeHtml(t.status) : ''}</a>`).join('')
+                    : '';
+                const infoBadges = [
+                    project.owner ? `<span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs">👥 ${escapeHtml(project.owner)}</span>` : '',
+                    project.timeline ? `<span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs">🗓️ ${escapeHtml(project.timeline)}</span>` : '',
+                    project.nextMilestone ? `<span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs">🎯 ${escapeHtml(project.nextMilestone)}</span>` : ''
+                ].filter(Boolean).join('');
                 return `
                     <section class="bg-white rounded-3xl border border-slate-200 p-6 shadow-soft">
                         <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-5">
@@ -936,13 +999,11 @@
                                 <div class="flex items-center gap-3 flex-wrap">
                                     <h3 class="text-2xl font-black text-slate-900">${escapeHtml(project.name)}</h3>
                                     <span class="px-3 py-1 rounded-full text-xs font-bold border ${getStatusBadge(project.status)}">${escapeHtml(project.status)}</span>
+                                    ${collapseButton}
                                 </div>
-                                <p class="text-sm text-slate-500 mt-3 leading-7">${escapeHtml(project.summary)}</p>
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs">👥 ${escapeHtml(project.owner)}</span>
-                                    <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs">🗓️ ${escapeHtml(project.timeline)}</span>
-                                    <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs">🎯 ${escapeHtml(project.nextMilestone)}</span>
-                                </div>
+                                <p class="text-sm text-slate-500 mt-3 leading-7">${escapeHtml(project.summary || '')}</p>
+                                ${infoBadges ? `<div class="mt-4 flex flex-wrap gap-2">${infoBadges}</div>` : ''}
+                                ${tapdBadges ? `<div class="mt-2 flex flex-wrap gap-2">${tapdBadges}</div>` : ''}
                             </div>
                             <div class="w-full xl:w-64 rounded-3xl bg-slate-50 border border-slate-200 p-5 shrink-0">
                                 <p class="text-xs text-slate-400 font-semibold">当前进度</p>
@@ -954,7 +1015,7 @@
                                     <div class="h-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400" style="width:${progress.percent}%"></div>
                                 </div>
                                 <div class="mt-4 flex flex-wrap gap-2">
-                                    ${project.highlights.map(item => `<span class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-[11px] text-slate-600">${escapeHtml(item)}</span>`).join('')}
+                                    ${(project.highlights || []).map(item => `<span class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-[11px] text-slate-600">${escapeHtml(item)}</span>`).join('')}
                                 </div>
                             </div>
                         </div>
@@ -1012,24 +1073,61 @@
 
         function renderReports() {
             const preview = document.getElementById('report-preview');
-            const latest = board.reportHistory[0];
-            if (latest) {
-                preview.value = formatReportText(latest);
-            } else {
-                preview.value = '点击“生成并留存一份日报”后，会在这里出现日报预览。';
+            // 只在预览为空时用最新日报填充；否则保留用户正在编辑的内容
+            if (preview && !preview.value) {
+                const latest = board.reportHistory[0];
+                if (latest) preview.value = formatReportText(latest);
             }
 
-            document.getElementById('report-history-timeline').innerHTML = board.reportHistory.map((report, index) => `
+            const timeline = document.getElementById('report-history-timeline');
+            if (!timeline) return;
+            if (board.reportHistory.length === 0) {
+                timeline.innerHTML = '<div class="rounded-2xl bg-slate-50 border border-dashed border-slate-300 p-6 text-center text-xs text-slate-400">还没有日报留痕。<br>在左侧编辑内容后点「✅ 确认保存到时间轴」即可生成第一条。</div>';
+                return;
+            }
+            timeline.innerHTML = board.reportHistory.map((report, index) => {
+                const dayKey = report.dayKey || (report.generatedAt || '').slice(0, 10);
+                const isV2 = report.schema === 'v2';
+                // 快照（v2）
+                let snapshotHtml = '';
+                if (isV2 && Array.isArray(report.projectSnapshot) && report.projectSnapshot.length > 0) {
+                    snapshotHtml = report.projectSnapshot.map(s => `
+                        <div class="text-xs">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-slate-700 truncate flex-1">${escapeHtml(s.name)}</span>
+                                <span class="text-slate-500 shrink-0">${s.percent}% <span class="text-slate-300">(${s.done}/${s.total})</span></span>
+                            </div>
+                            <div class="mt-1 h-1.5 rounded-full bg-slate-200 overflow-hidden">
+                                <div class="h-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-400" style="width:${s.percent}%"></div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                // 折叠内容
+                const bodyHtml = isV2
+                    ? `<pre class="mt-3 whitespace-pre-wrap text-xs text-slate-600 leading-6 bg-white rounded-lg border border-slate-200 p-3 max-h-64 overflow-y-auto">${escapeHtml(report.content || '')}</pre>`
+                    : `<div class="mt-3 text-xs text-slate-600 leading-6"><p class="font-semibold text-slate-700">完成 ${(report.completed || []).length} 条 · 待办 ${(report.todos || []).length} 条</p><p class="mt-1 text-slate-500">${escapeHtml(report.reflection || '')}</p></div>`;
+
+                return `
                 <div class="relative pl-6">
                     <span class="absolute left-0 top-1.5 w-3 h-3 rounded-full ${index === 0 ? 'bg-emerald-500' : 'bg-slate-300'}"></span>
                     ${index !== board.reportHistory.length - 1 ? '<span class="absolute left-[5px] top-5 bottom-[-18px] w-px bg-slate-200"></span>' : ''}
                     <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
-                        <p class="text-xs font-semibold text-slate-400">${escapeHtml(report.generatedAt)}</p>
-                        <p class="text-sm font-bold text-slate-900 mt-1">完成 ${report.completed.length} 条 · 待办 ${report.todos.length} 条</p>
-                        <p class="text-xs text-slate-500 mt-2 leading-6">${escapeHtml(report.reflection)}</p>
+                        <div class="flex items-center justify-between gap-2">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-400">${escapeHtml(dayKey)}${index === 0 ? ' · 最新' : ''}</p>
+                                <p class="text-sm font-bold text-slate-900 mt-0.5">${escapeHtml(report.generatedAt || '')}</p>
+                            </div>
+                            <button onclick="toggleReportItem('${escapeHtml(report.id)}')" class="text-xs text-slate-400 hover:text-slate-700 px-2 py-1 rounded-lg hover:bg-white transition" id="report-arrow-${escapeHtml(report.id)}">▼</button>
+                        </div>
+                        ${snapshotHtml ? `<div class="mt-3 space-y-2">${snapshotHtml}</div>` : ''}
+                        <div id="report-body-${escapeHtml(report.id)}" class="hidden">
+                            ${bodyHtml}
+                        </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function renderProjectOptions() {
@@ -1357,43 +1455,95 @@
             return `当前风险主要集中在 ${urgentPending.map(task => task.text).join('、')}。优先把这些事项清掉，可以显著提升本周交付确定性。`;
         }
 
-        function generateDailyReport() {
+        // 生成日报初稿：填入 textarea，不落库；用户可以自由编辑后再点「确认保存」
+        function fillReportDraft() {
             const completed = getAllTasks().filter(task => task.completed).map(task => `${task.projectName}：${task.text}`);
-            const todos = getAllTasks().filter(task => !task.completed).slice(0, 6).map(task => `${task.projectName}：${task.text}`);
-            const report = {
-                id: `report-${Date.now()}`,
-                generatedAt: nowText(),
-                completed,
-                todos,
-                reflection: buildReflection()
-            };
-            board.reportHistory.unshift(report);
-            saveBoard();
-            showToast('已生成并留存一份日报');
+            const todos = getAllTasks().filter(task => !task.completed).slice(0, 8).map(task => `${task.projectName}：${task.text}`);
+            const completedText = completed.length ? completed.map(item => `- ${item}`).join('\n') : '- 暂无已完成事项';
+            const todoText = todos.length ? todos.map(item => `- ${item}`).join('\n') : '- 暂无待办事项';
+            const text = `【${nowText()} 工作日报】\n\n一、今天完成的事项\n${completedText}\n\n二、待办事项\n${todoText}\n\n三、复盘与思考\n${buildReflection()}`;
+            document.getElementById('report-preview').value = text;
+            showToast('已生成初稿，可自由编辑后再点「确认保存」');
         }
 
+        // 确认保存到时间轴：把 textarea 全文 + 各项目当时进度快照 存进 reportHistory
+        // 同一天已有则覆盖（1 天 1 条留痕）
+        function submitDailyReport() {
+            const text = (document.getElementById('report-preview').value || '').trim();
+            if (!text) {
+                showToast('日报内容为空，无法保存');
+                return;
+            }
+            const today = new Date();
+            const dayKey = today.toISOString().slice(0, 10); // YYYY-MM-DD
+            const projectSnapshot = board.projects.map(p => {
+                const progress = getProgress(p);
+                return {
+                    id: p.id,
+                    name: p.name,
+                    status: p.status,
+                    percent: progress.percent,
+                    done: progress.done,
+                    total: progress.total
+                };
+            });
+            const existingIdx = board.reportHistory.findIndex(r => (r.dayKey || (r.generatedAt || '').slice(0, 10)) === dayKey);
+            const newReport = {
+                id: existingIdx >= 0 ? board.reportHistory[existingIdx].id : `report-${Date.now()}`,
+                schema: 'v2',
+                dayKey,
+                generatedAt: nowText(),
+                content: text,               // 完整文本（用户编辑后的）
+                projectSnapshot              // 当日各项目进度快照
+            };
+            if (existingIdx >= 0) {
+                board.reportHistory.splice(existingIdx, 1, newReport);
+                showToast('今天的日报已覆盖更新');
+            } else {
+                board.reportHistory.unshift(newReport);
+                showToast('日报已保存到时间轴');
+            }
+            // 保持时间轴按日期倒序
+            board.reportHistory.sort((a, b) => {
+                const ka = a.dayKey || (a.generatedAt || '').slice(0, 10);
+                const kb = b.dayKey || (b.generatedAt || '').slice(0, 10);
+                return kb.localeCompare(ka);
+            });
+            saveBoard();
+        }
+
+        // 兼容：老 report 结构（completed/todos/reflection）也能格式化成文本
         function formatReportText(report) {
-            const completedText = report.completed.length ? report.completed.map(item => `- ${item}`).join('\n') : '- 暂无已完成事项';
-            const todoText = report.todos.length ? report.todos.map(item => `- ${item}`).join('\n') : '- 暂无待办事项';
-            return `【${report.generatedAt} 工作日报】\n\n一、今天完成的事项\n${completedText}\n\n二、待办事项\n${todoText}\n\n三、复盘与思考\n${report.reflection}`;
+            if (report.content) return report.content; // v2 直接用完整文本
+            const completedText = (report.completed || []).length ? report.completed.map(item => `- ${item}`).join('\n') : '- 暂无已完成事项';
+            const todoText = (report.todos || []).length ? report.todos.map(item => `- ${item}`).join('\n') : '- 暂无待办事项';
+            return `【${report.generatedAt} 工作日报】\n\n一、今天完成的事项\n${completedText}\n\n二、待办事项\n${todoText}\n\n三、复盘与思考\n${report.reflection || ''}`;
         }
 
         async function copyLatestReport() {
-            const latest = board.reportHistory[0];
-            if (!latest) {
-                showToast('还没有日报可复制');
+            const text = (document.getElementById('report-preview').value || '').trim();
+            if (!text) {
+                showToast('当前预览区为空');
                 return;
             }
-            const text = formatReportText(latest);
             try {
                 await navigator.clipboard.writeText(text);
-                showToast('日报已复制到剪贴板');
+                showToast('已复制到剪贴板');
             } catch (error) {
                 const textarea = document.getElementById('report-preview');
                 textarea.select();
                 document.execCommand('copy');
-                showToast('日报已复制到剪贴板');
+                showToast('已复制到剪贴板');
             }
+        }
+
+        // 时间轴展开/折叠
+        function toggleReportItem(reportId) {
+            const el = document.getElementById(`report-body-${reportId}`);
+            if (!el) return;
+            el.classList.toggle('hidden');
+            const arrow = document.getElementById(`report-arrow-${reportId}`);
+            if (arrow) arrow.textContent = el.classList.contains('hidden') ? '▼' : '▲';
         }
 
         function sendChatInput() {

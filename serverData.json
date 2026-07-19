@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-17 14:15",
-  "sourceHint": "本周同步：07-13~07-16 共 7 场；今日（07-17 午班）补齐 13 场堆积会议（06-22 ~ 07-10）",
+  "generatedAt": "2026-07-19 23:46",
+  "sourceHint": "已按「王艺菱主责 + PC 电管板块」重构：3 独立业务 + 6 PC 电管项目 + 会议重新归类",
   "projects": [
     {
       "id": "proj-invoice",
@@ -16,7 +16,9 @@
         "作废",
         "红字确认",
         "UIN",
-        "站内信"
+        "站内信",
+        "重新开票",
+        "message 气泡"
       ]
     },
     {
@@ -24,7 +26,7 @@
       "name": "套餐升级（升配）功能",
       "status": "测试中",
       "summary": "支持标准/高级用户升配到旗舰版；「先买后退」交易逻辑，退款金额动态计算。",
-      "nextMilestone": "退款差额展示话术 + 退旧场景票据核验",
+      "nextMilestone": "退款差额展示话术 + 退旧场景票据核验 + 退货不退款方案落地",
       "keywords": [
         "升配",
         "套餐升级",
@@ -32,7 +34,11 @@
         "预计退款",
         "旗舰版",
         "标准版",
-        "高级版"
+        "高级版",
+        "计量",
+        "扣减",
+        "退货不退款",
+        "自动续费"
       ]
     },
     {
@@ -47,16 +53,45 @@
         "消耗",
         "反馈",
         "邮箱",
-        "工单"
+        "工单",
+        "UIN诊断"
       ]
     },
     {
-      "id": "proj-page-perf",
-      "name": "软件页/更新页体验优化",
+      "id": "proj-game-homepage-revamp",
+      "name": "[玩游戏] 首页改版 V1.0 + V2.0",
       "status": "推进中",
-      "summary": "包含页面加载闪烁优化（预渲染替换/串行改并行）、更新页兜底与数据。",
-      "nextMilestone": "短期：串行改并行接口落地并弱网自测；长期：首屏预加载 / 客户端静态资源打包评估",
+      "owner": "王艺菱 / 沙舟 / 何煦",
+      "summary": "首页改版分 V1.0（产品/设计走查中，1 组件未开发、与 2.0 一起测试）+ V2.0（已研评，下周二提测，同步 AMS 改版）。改版包括：首页命名改「推荐」、标签页统一、样式组件化、样式配置化排序。",
+      "nextMilestone": "V2.0 下周二提测 + V1.0 产品验收 + AMS 同步改版",
       "keywords": [
+        "首页",
+        "改版",
+        "推荐",
+        "标签页",
+        "AMS",
+        "样式组件",
+        "商业化",
+        "ecpm",
+        "开机",
+        "精准推荐",
+        "用户分层",
+        "投放实验",
+        "方法论",
+        "V1.0",
+        "V2.0"
+      ]
+    },
+    {
+      "id": "proj-game-homepage-weaknet",
+      "name": "[玩游戏] 首页弱网兜底优化",
+      "status": "推进中",
+      "owner": "王艺菱 / 沙舟 / 何煦",
+      "summary": "跟进研发进展，宋锐提供后台接口（预计下周一）。同时含页面加载闪烁优化（预渲染替换/串行改并行/JSON Proxy/首屏预加载）。",
+      "nextMilestone": "宋锐后台接口下周一到位 + 前端串行改并行落地",
+      "keywords": [
+        "弱网",
+        "兜底",
         "闪烁",
         "加载",
         "预渲染",
@@ -64,58 +99,38 @@
         "AMS",
         "QMI",
         "首屏",
-        "更新页",
         "串行",
         "并行",
-        "软件页"
+        "宋锐"
       ]
     },
     {
-      "id": "proj-reco-monetize",
-      "name": "推荐首页与商业化策略",
+      "id": "proj-download-pageplay-test",
+      "name": "[下软件] 页游投放测试",
       "status": "推进中",
-      "summary": "首页更名为「推荐」、标签页统一、样式组件化；商业化聚焦中心化场景 / 精准推荐 / 开机资源位。",
-      "nextMilestone": "开机 ecpm 梳理 + 10 万量级投放实验；假设驱动 + 用户九宫格分层",
+      "owner": "王艺菱 / 沙舟 / 何煦",
+      "summary": "保留实验到下周一，回收数据确认页游价值，随后与 AMS 拉推广资源。",
+      "nextMilestone": "下周一回收数据 → 确认页游价值 → 与 AMS 拉推广资源",
       "keywords": [
-        "推荐",
-        "首页",
-        "标签页",
-        "商业化",
-        "ecpm",
-        "开机",
-        "精准推荐",
-        "用户分层",
-        "投放实验",
-        "方法论"
-      ]
-    },
-    {
-      "id": "proj-data-dashboard",
-      "name": "数据看板与埋点",
-      "status": "推进中",
-      "summary": "更新页/游戏墙数据补齐：点击定位、时长上报、专题ID差异、看板承载位置。",
-      "nextMilestone": "拉群邀请东哥/景文查数据 + 与运营佳宁对齐专题ID差异",
-      "keywords": [
-        "数据看板",
-        "埋点",
-        "点击定位",
-        "时长上报",
-        "专题ID",
-        "游戏墙",
-        "更新页数据"
+        "页游",
+        "投放",
+        "测试",
+        "AMS 推广"
       ]
     },
     {
       "id": "proj-update-game-block",
-      "name": "更新页游戏板块优化",
+      "name": "[下软件] 更新页游戏板块优化",
       "status": "推进中",
-      "summary": "更新页游戏板块改版：列表数量、位置、标题、爱康卡内容等改动，通过小实验分阶段验证。核心指标：页面聚焦时长 + 点击率。",
-      "nextMilestone": "列表最多展示数量 5→4 上线 + 更新页停留时长(focus) 埋点方案确认",
+      "owner": "王艺菱 / 沙舟 / 何煦",
+      "summary": "更新页游戏板块改版：列表数量、板块位置、标题、爱康卡内容等改动，通过小实验分阶段验证。核心指标：聚焦时长 + 点击率。",
+      "nextMilestone": "本周推动「更新列表最多展示数量减少」+「游戏板块标题变更」两个已评审需求实验；游戏 icon 卡片变更通过小游戏改版数据预估效果",
       "keywords": [
         "更新页",
         "游戏板块",
         "小实验",
         "列表数量",
+        "5改4",
         "聚焦时长",
         "focus",
         "停留时长",
@@ -123,7 +138,60 @@
         "点击率",
         "爱康卡",
         "首页停留",
-        "stay"
+        "stay",
+        "板块标题",
+        "icon 卡片",
+        "横版游戏卡片"
+      ],
+      "tapdRefs": [
+        {
+          "id": "1020428790136196052",
+          "title": "更新列表最多展示软件数量减少",
+          "url": "https://tapd.woa.com/tapd_fe/20428790/story/detail/1020428790136196052",
+          "status": "已评审"
+        },
+        {
+          "id": "1020428790136197378",
+          "title": "游戏板块标题变更",
+          "url": "https://tapd.woa.com/tapd_fe/20428790/story/detail/1020428790136197378",
+          "status": "已评审"
+        }
+      ]
+    },
+    {
+      "id": "proj-mini-game-hero-slot",
+      "name": "[下软件] 小游戏页霸屏资源位",
+      "status": "推进中",
+      "owner": "王艺菱 / 沙舟 / 何煦",
+      "summary": "小游戏页霸屏与发现页霸屏解耦，测试中；小游戏页霸屏视频预加载时长上报，测试中。",
+      "nextMilestone": "下软件首软霸屏预装渠道策略，完成和初步方案调研",
+      "keywords": [
+        "霸屏",
+        "小游戏页",
+        "发现页",
+        "视频预加载",
+        "首软霸屏",
+        "预装渠道"
+      ]
+    },
+    {
+      "id": "proj-game-heatmap",
+      "name": "[数据] 玩游戏首页热力图统计",
+      "status": "推进中",
+      "owner": "王艺菱 / 沙舟 / 何煦",
+      "summary": "玩游戏首页热力图仅有上月数据（非实时更新），为便于跟进每个板块的点击/收入情况，需建立热力图日更统计。含更新页数据维度补齐（分页面/专题/软件ID）、点击定位、时长上报。",
+      "nextMilestone": "拉群邀请东哥/景文查看点击定位与时长上报 + 与运营佳宁确认专题 ID 差异 + 游戏墙数据补入现有看板",
+      "keywords": [
+        "热力图",
+        "数据看板",
+        "埋点",
+        "点击定位",
+        "时长上报",
+        "专题ID",
+        "游戏墙",
+        "更新页数据",
+        "非实时",
+        "日更"
       ]
     }
   ],
@@ -154,7 +222,8 @@
         "「聚焦时长」比「下载时长」更能反映用户真实关注度——避免被网速这类无关变量污染",
         "关闭窗口这类异常场景要主动想兜底：不能因为「大部分用户不会这样」就默认丢失该场景数据"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-17_369169463_更新页游戏板块优化需求评审.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-17_369169463_更新页游戏板块优化需求评审.md",
+      "projectId": "proj-update-game-block"
     },
     {
       "serverSyncId": "sum-416533737",
@@ -177,7 +246,8 @@
         "已有数据未必进看板 —— 需要主动清点「哪些维度落了、哪些散在临时 AB 里」",
         "运营/研发命名不统一时（专题 ID），必须回到源头（运营佳宁）而不是猜"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-16_416533737_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-16_416533737_yilingwang的快速会议.md",
+      "projectId": "proj-game-heatmap"
     },
     {
       "serverSyncId": "sum-754489105",
@@ -206,7 +276,8 @@
         "「假设驱动」是所有实验的前提，没有假设的实验无法解读结果好坏",
         "化整为零：不追求大而全，先改首屏验证，再工程化推广"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-15_754489105_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-15_754489105_yilingwang的快速会议.md",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "sum-493967419",
@@ -231,7 +302,8 @@
         "短期「串行改并行」不改变闪烁本质，但让用户感知变弱——先减弱再消除",
         "AMS 与业务数据的耦合是收益 vs 体验的经典权衡点，别为了体验牺牲画像精度"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-15_493967419_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-15_493967419_yilingwang的快速会议.md",
+      "projectId": "proj-game-homepage-weaknet"
     },
     {
       "serverSyncId": "sum-162470097",
@@ -254,7 +326,8 @@
         "升配 = 换套餐，而不是「续费」，旧套餐一定要显式作废，否则续费逻辑会打架",
         "线下已成熟的规则线上没搬 → 说明「线下运营 SOP」和「产品能力」需要主动同步"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-15_162470097_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-15_162470097_yilingwang的快速会议.md",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "sum-269703744",
@@ -278,7 +351,8 @@
         "状态语义 vs 提示语义要分开：状态给用户看历史，提示给用户看结果",
         "小改动先局部保守，大范围统一之前先跑一版看有没有回归风险"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-14_269703744_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-14_269703744_yilingwang的快速会议.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-666508522",
@@ -301,7 +375,8 @@
         "排查思路先「数据变没变」再「上报有没有」，避免直接跳到根因假设",
         "跨团队问题要尽早艾特对方群里协作，别自己闷头查"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-13_666508522_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-13_666508522_yilingwang的快速会议.md",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "sum-605550329",
@@ -326,7 +401,8 @@
         "整场围绕退款前先退票展开，是订单发票上线后的流程补齐",
         "升配「买新退旧」的退款逻辑是用户理解成本最高的点"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-16_605550329_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-16_605550329_yilingwang的快速会议.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-765379065",
@@ -349,7 +425,8 @@
         "邮箱/站内信/下载 三级兜底方案：邮箱通了走邮箱，否则页面下载",
         "开票信息二次校验很重要，避免开错抬头/金额"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-06-22_765379065_订单与发票需求评审.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-06-22_765379065_订单与发票需求评审.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-188859509",
@@ -372,7 +449,8 @@
         "升配用户视角天然想「补差价」，但技术是「先买后退」，交互需重点解释",
         "退款金额需展示，但要标注计算逻辑，避免被投诉「故意坑钱」"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-06-25_188859509_升配需求评审.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-06-25_188859509_升配需求评审.md",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "sum-150872294",
@@ -394,7 +472,8 @@
         "张娱强调：不能让研发天天单点查用户日志，必须工具化 + 定量化",
         "「退套餐」和「退积分」是两件事，不能混，会影响商业化数据"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-06-18_150872294_积分相关用户反馈处理demo.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-06-18_150872294_积分相关用户反馈处理demo.md",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "sum-587482601",
@@ -423,7 +502,8 @@
         "口径要在评审前先跟研发对齐（个人只能开一个抬头/税号联想机制），否则测试和产品会各说各话",
         "「知道有这个数据 vs 数据接口 ready」是两码事——涉及后台配合的动作要提前把接口/权限拉通，别把口头能力当默认可用"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-06-29_587482601_用例评审：订单与发票+升配.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-06-29_587482601_用例评审：订单与发票+升配.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-998645639",
@@ -447,7 +527,8 @@
         "「关键信息层级」比整体样式更重要——先决定用户第一眼看什么，再谈色系与卡片形式",
         "面对样式改造压力（浅色化），要区分「本次要做」和「后续统一做」，避免临阵大改导致工期失控"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-06-29_998645639_升配设计讨论.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-06-29_998645639_升配设计讨论.md",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "sum-779912090",
@@ -475,7 +556,8 @@
         "「简单一句引导用户去腾讯云」不叫方案——引导的账号问题、跳转体验、UIN 关联都是需要显式写清的方案组成部分",
         "需求边界：「需求包括功能」是错的，「需求包括功能+配套动作+数据依赖+人员协作」才是完整需求"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-06-22_779912090_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-06-22_779912090_yilingwang的快速会议.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-343216730",
@@ -499,7 +581,8 @@
         "AI 生成测试用例的通病：想「区分主端网页端」但没真区分开，还会造成场景重叠；产品要先按「用户改动点」重构结构再交测试",
         "错误提示（比如「多次绘话」）等 AI 表述要 review，用户/研发看不懂等于没写"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-06-23_343216730_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-06-23_343216730_yilingwang的快速会议.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-175481386",
@@ -522,7 +605,8 @@
         "「设计稿明明写非必填，但后端校验依然强制」是最常见跨端 bug —— 需要产品在发版前跑一遍关键路径核对",
         "测试环境和正式环境「财经异步链路」延迟差别大，测试时的偶现问题要区分「代码问题」还是「测试环境限制」，别错误定性"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-06_175481386_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-06_175481386_yilingwang的快速会议.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-647521797",
@@ -545,7 +629,8 @@
         "「让用户点了才知道不行」是体验大忌 —— 状态判断能在列表阶段做的，就绝不推迟到操作阶段",
         "「重新开票路径 vs 普通开票路径」是同样的业务但两个技术分支，前端很容易只在一处补逻辑漏另一处 → 后续凡是分支路径都要列 checklist 走查"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-06_647521797_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-06_647521797_yilingwang的快速会议.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-297383994",
@@ -566,7 +651,8 @@
         "跨集团配合最贵的成本是「拨错人」——需求前先确认自己的开票/退票主体归属，别按 ID 或猜测直接拉人",
         "「已抵扣 vs 未抵扣」在产品层要允许用户自选，但界面文案要说清楚：「个人开票一般选未抵扣」，避免用户按错选项后发现开不出票"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-07_297383994_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-07_297383994_yilingwang的快速会议.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-695756060",
@@ -588,7 +674,8 @@
         "「用户输入的字段」不等于「用户能获取的信息」—— 红字确认单号我们只是填入方，责任在购方那边；产品要为用户提供获取指引",
         "已抵扣/未抵扣的口径要写在产品文案，别指望燕锺/客服每次都解释一遍"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-07_695756060_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-07_695756060_yilingwang的快速会议.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-699123528",
@@ -613,7 +700,8 @@
         "「跟着版本节奏拆需求」而不是「等所有需求 ready 一起上」—— 主端 vs 网页端、可升配版本 vs 旗舰版都是很好的拆分点",
         "小需求（QA list/续费提示）搭主线版本一起上是最经济的资源利用，不要每个小改都拉一次发版"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-07_699123528_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-07_699123528_yilingwang的快速会议.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-356937698",
@@ -645,7 +733,8 @@
         "AI 评估流程 = ①执行 ②留档 ③人工复核 ④反馈 —— 第②和第④步产品很容易忘",
         "「对话内容」是用户能看到的东西，「trace user query」是研发能看到的东西 —— 产品文案/字段选择要按用户视角，不按底层视角"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-07_356937698_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-07_356937698_yilingwang的快速会议.md",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "sum-253354960",
@@ -667,7 +756,8 @@
         "「视觉差异化」是最便宜的渠道运营钩子——不改产品能力、只改样式，几乎不侵入主链路",
         "先要「设计工期估算」再确定要不要做，避免仅凭沟通就拍板"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-08_253354960_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-08_253354960_yilingwang的快速会议.md",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "sum-802368537",
@@ -690,7 +780,8 @@
         "「找计费借费退款」= 短平快但不合规；「人工调接口」= 合规且快 —— 优先合规而不是路径最短",
         "偶现问题要区分「代码 bug」还是「下游依赖抖动」，前者要修，后者要有告警和人工兜底"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-10_802368537_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-10_802368537_yilingwang的快速会议.md",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "sum-740899701",
@@ -714,7 +805,8 @@
         "「解绑后单变新购」的用户侧名称是否变化要在方案里明确 —— 否则测试时会互相怀疑",
         "分层复用：升配退订 = 解绑 + 常规退订，避免重复实现「特殊退订流程」，让升配退款和普通退款走同一套代码路径"
       ],
-      "rawContent": "详见本地归档 逐字稿归档/2026-07-10_740899701_yilingwang的快速会议.md"
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-10_740899701_yilingwang的快速会议.md",
+      "projectId": "proj-upgrade"
     }
   ],
   "tasks": [
@@ -724,7 +816,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-605550329"
+      "source": "meeting-605550329",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-605550329-2",
@@ -732,7 +825,8 @@
       "projectHint": "订单与发票",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-605550329"
+      "source": "meeting-605550329",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-605550329-3",
@@ -740,7 +834,8 @@
       "projectHint": "订单与发票",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-605550329"
+      "source": "meeting-605550329",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-605550329-4",
@@ -748,7 +843,8 @@
       "projectHint": "升配",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-605550329"
+      "source": "meeting-605550329",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-765379065-1",
@@ -756,7 +852,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-765379065"
+      "source": "meeting-765379065",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-765379065-2",
@@ -764,7 +861,8 @@
       "projectHint": "订单与发票",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-765379065"
+      "source": "meeting-765379065",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-188859509-1",
@@ -772,7 +870,8 @@
       "projectHint": "升配",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-188859509"
+      "source": "meeting-188859509",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-188859509-2",
@@ -780,7 +879,8 @@
       "projectHint": "升配",
       "priority": "高",
       "quadrant": "important-not-urgent",
-      "source": "meeting-188859509"
+      "source": "meeting-188859509",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-188859509-3",
@@ -788,7 +888,8 @@
       "projectHint": "升配",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-188859509"
+      "source": "meeting-188859509",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-150872294-1",
@@ -796,7 +897,8 @@
       "projectHint": "积分",
       "priority": "高",
       "quadrant": "important-not-urgent",
-      "source": "meeting-150872294"
+      "source": "meeting-150872294",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "task-150872294-2",
@@ -804,7 +906,8 @@
       "projectHint": "积分",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-150872294"
+      "source": "meeting-150872294",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "task-150872294-3",
@@ -812,7 +915,8 @@
       "projectHint": "积分",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-150872294"
+      "source": "meeting-150872294",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "task-666508522-1",
@@ -820,7 +924,8 @@
       "projectHint": "升配",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-666508522"
+      "source": "meeting-666508522",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-666508522-2",
@@ -828,7 +933,8 @@
       "projectHint": "升配",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-666508522"
+      "source": "meeting-666508522",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-269703744-1",
@@ -836,7 +942,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-269703744"
+      "source": "meeting-269703744",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-269703744-2",
@@ -844,7 +951,8 @@
       "projectHint": "订单与发票",
       "priority": "低",
       "quadrant": "important-not-urgent",
-      "source": "meeting-269703744"
+      "source": "meeting-269703744",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-162470097-1",
@@ -852,7 +960,8 @@
       "projectHint": "升配",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-162470097"
+      "source": "meeting-162470097",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-162470097-2",
@@ -860,7 +969,8 @@
       "projectHint": "升配",
       "priority": "中",
       "quadrant": "urgent-not-important",
-      "source": "meeting-162470097"
+      "source": "meeting-162470097",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-162470097-3",
@@ -868,7 +978,8 @@
       "projectHint": "升配",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-162470097"
+      "source": "meeting-162470097",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-493967419-1",
@@ -876,7 +987,8 @@
       "projectHint": "软件页",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-493967419"
+      "source": "meeting-493967419",
+      "projectId": "proj-game-homepage-weaknet"
     },
     {
       "serverSyncId": "task-493967419-2",
@@ -884,7 +996,8 @@
       "projectHint": "软件页",
       "priority": "高",
       "quadrant": "important-not-urgent",
-      "source": "meeting-493967419"
+      "source": "meeting-493967419",
+      "projectId": "proj-game-homepage-weaknet"
     },
     {
       "serverSyncId": "task-493967419-3",
@@ -892,7 +1005,8 @@
       "projectHint": "软件页",
       "priority": "中",
       "quadrant": "urgent-important",
-      "source": "meeting-493967419"
+      "source": "meeting-493967419",
+      "projectId": "proj-game-homepage-weaknet"
     },
     {
       "serverSyncId": "task-493967419-4",
@@ -900,7 +1014,8 @@
       "projectHint": "软件页",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-493967419"
+      "source": "meeting-493967419",
+      "projectId": "proj-game-homepage-weaknet"
     },
     {
       "serverSyncId": "task-754489105-1",
@@ -908,7 +1023,8 @@
       "projectHint": "推荐",
       "priority": "高",
       "quadrant": "important-not-urgent",
-      "source": "meeting-754489105"
+      "source": "meeting-754489105",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "task-754489105-2",
@@ -916,7 +1032,8 @@
       "projectHint": "推荐",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-754489105"
+      "source": "meeting-754489105",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "task-754489105-3",
@@ -924,7 +1041,8 @@
       "projectHint": "商业化",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-754489105"
+      "source": "meeting-754489105",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "task-754489105-4",
@@ -932,7 +1050,8 @@
       "projectHint": "商业化",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-754489105"
+      "source": "meeting-754489105",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "task-754489105-5",
@@ -940,7 +1059,8 @@
       "projectHint": "方法论",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-754489105"
+      "source": "meeting-754489105",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "task-416533737-1",
@@ -948,7 +1068,8 @@
       "projectHint": "数据看板",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-416533737"
+      "source": "meeting-416533737",
+      "projectId": "proj-game-heatmap"
     },
     {
       "serverSyncId": "task-416533737-2",
@@ -956,7 +1077,8 @@
       "projectHint": "数据看板",
       "priority": "中",
       "quadrant": "urgent-important",
-      "source": "meeting-416533737"
+      "source": "meeting-416533737",
+      "projectId": "proj-game-heatmap"
     },
     {
       "serverSyncId": "task-416533737-3",
@@ -964,7 +1086,8 @@
       "projectHint": "数据看板",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-416533737"
+      "source": "meeting-416533737",
+      "projectId": "proj-game-heatmap"
     },
     {
       "serverSyncId": "task-369169463-1",
@@ -972,7 +1095,8 @@
       "projectHint": "更新页游戏板块",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-369169463"
+      "source": "meeting-369169463",
+      "projectId": "proj-update-game-block"
     },
     {
       "serverSyncId": "task-369169463-2",
@@ -980,7 +1104,8 @@
       "projectHint": "更新页游戏板块",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-369169463"
+      "source": "meeting-369169463",
+      "projectId": "proj-update-game-block"
     },
     {
       "serverSyncId": "task-369169463-3",
@@ -988,7 +1113,8 @@
       "projectHint": "更新页游戏板块",
       "priority": "高",
       "quadrant": "important-not-urgent",
-      "source": "meeting-369169463"
+      "source": "meeting-369169463",
+      "projectId": "proj-update-game-block"
     },
     {
       "serverSyncId": "task-369169463-4",
@@ -996,7 +1122,8 @@
       "projectHint": "更新页游戏板块",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-369169463"
+      "source": "meeting-369169463",
+      "projectId": "proj-update-game-block"
     },
     {
       "serverSyncId": "task-369169463-5",
@@ -1004,7 +1131,8 @@
       "projectHint": "更新页游戏板块",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-369169463"
+      "source": "meeting-369169463",
+      "projectId": "proj-update-game-block"
     },
     {
       "serverSyncId": "task-369169463-6",
@@ -1012,7 +1140,8 @@
       "projectHint": "更新页游戏板块",
       "priority": "高",
       "quadrant": "important-not-urgent",
-      "source": "meeting-369169463"
+      "source": "meeting-369169463",
+      "projectId": "proj-update-game-block"
     },
     {
       "serverSyncId": "task-587482601-1",
@@ -1020,7 +1149,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-587482601"
+      "source": "meeting-587482601",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-587482601-2",
@@ -1028,7 +1158,8 @@
       "projectHint": "订单与发票",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-587482601"
+      "source": "meeting-587482601",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-587482601-3",
@@ -1036,7 +1167,8 @@
       "projectHint": "升配",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-587482601"
+      "source": "meeting-587482601",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-587482601-4",
@@ -1044,7 +1176,8 @@
       "projectHint": "升配",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-587482601"
+      "source": "meeting-587482601",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-998645639-1",
@@ -1052,7 +1185,8 @@
       "projectHint": "升配",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-998645639"
+      "source": "meeting-998645639",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-998645639-2",
@@ -1060,7 +1194,8 @@
       "projectHint": "升配",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-998645639"
+      "source": "meeting-998645639",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-779912090-1",
@@ -1068,7 +1203,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-779912090"
+      "source": "meeting-779912090",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-779912090-2",
@@ -1076,7 +1212,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-779912090"
+      "source": "meeting-779912090",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-779912090-3",
@@ -1084,7 +1221,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-779912090"
+      "source": "meeting-779912090",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-343216730-1",
@@ -1092,7 +1230,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-343216730"
+      "source": "meeting-343216730",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-343216730-2",
@@ -1100,7 +1239,8 @@
       "projectHint": "订单与发票",
       "priority": "中",
       "quadrant": "urgent-important",
-      "source": "meeting-343216730"
+      "source": "meeting-343216730",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-175481386-1",
@@ -1108,7 +1248,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-175481386"
+      "source": "meeting-175481386",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-175481386-2",
@@ -1116,7 +1257,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-175481386"
+      "source": "meeting-175481386",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-647521797-1",
@@ -1124,7 +1266,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-647521797"
+      "source": "meeting-647521797",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-647521797-2",
@@ -1132,7 +1275,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-647521797"
+      "source": "meeting-647521797",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-297383994-1",
@@ -1140,7 +1284,8 @@
       "projectHint": "订单与发票",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-297383994"
+      "source": "meeting-297383994",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-695756060-1",
@@ -1148,7 +1293,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-695756060"
+      "source": "meeting-695756060",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-695756060-2",
@@ -1156,7 +1302,8 @@
       "projectHint": "订单与发票",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-695756060"
+      "source": "meeting-695756060",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-699123528-1",
@@ -1164,7 +1311,8 @@
       "projectHint": "升配",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-699123528"
+      "source": "meeting-699123528",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-699123528-2",
@@ -1172,7 +1320,8 @@
       "projectHint": "订单与发票",
       "priority": "高",
       "quadrant": "important-not-urgent",
-      "source": "meeting-699123528"
+      "source": "meeting-699123528",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-699123528-3",
@@ -1180,7 +1329,8 @@
       "projectHint": "订单与发票",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-699123528"
+      "source": "meeting-699123528",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "task-356937698-1",
@@ -1188,7 +1338,8 @@
       "projectHint": "积分",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-356937698"
+      "source": "meeting-356937698",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "task-356937698-2",
@@ -1196,7 +1347,8 @@
       "projectHint": "积分",
       "priority": "中",
       "quadrant": "urgent-important",
-      "source": "meeting-356937698"
+      "source": "meeting-356937698",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "task-356937698-3",
@@ -1204,7 +1356,8 @@
       "projectHint": "积分",
       "priority": "高",
       "quadrant": "important-not-urgent",
-      "source": "meeting-356937698"
+      "source": "meeting-356937698",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "task-356937698-4",
@@ -1212,7 +1365,8 @@
       "projectHint": "积分",
       "priority": "中",
       "quadrant": "important-not-urgent",
-      "source": "meeting-356937698"
+      "source": "meeting-356937698",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "task-356937698-5",
@@ -1220,7 +1374,8 @@
       "projectHint": "积分",
       "priority": "中",
       "quadrant": "urgent-important",
-      "source": "meeting-356937698"
+      "source": "meeting-356937698",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "task-253354960-1",
@@ -1228,7 +1383,8 @@
       "projectHint": "推荐",
       "priority": "低",
       "quadrant": "important-not-urgent",
-      "source": "meeting-253354960"
+      "source": "meeting-253354960",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "task-802368537-1",
@@ -1236,7 +1392,8 @@
       "projectHint": "升配",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-802368537"
+      "source": "meeting-802368537",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-740899701-1",
@@ -1244,7 +1401,8 @@
       "projectHint": "升配",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-740899701"
+      "source": "meeting-740899701",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "task-740899701-2",
@@ -1252,7 +1410,8 @@
       "projectHint": "升配",
       "priority": "高",
       "quadrant": "urgent-important",
-      "source": "meeting-740899701"
+      "source": "meeting-740899701",
+      "projectId": "proj-upgrade"
     }
   ],
   "inspires": [
@@ -1261,252 +1420,289 @@
       "id": "insp-605550329-1",
       "text": "退票验证地址已开好权限（填 UIN 查状态）→ 可做成客服「自助查验工具」，减少人工逐条核验成本。",
       "projectHint": "订单与发票",
-      "source": "会议逐字稿·605550329"
+      "source": "会议逐字稿·605550329",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "insp-605550329-2",
       "id": "insp-605550329-2",
       "text": "发票状态截图 + 退货订单编号 → 可固化成「退款信息收集清单」模板，避免来回追问。",
       "projectHint": "订单与发票",
-      "source": "会议逐字稿·605550329"
+      "source": "会议逐字稿·605550329",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "insp-605550329-3",
       "id": "insp-605550329-3",
       "text": "升配「买新退旧」用户无感知 → 可提炼成对外话术模板，避免用户误解退款金额。",
       "projectHint": "升配",
-      "source": "会议逐字稿·605550329"
+      "source": "会议逐字稿·605550329",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "insp-188859509-1",
       "id": "insp-188859509-1",
       "text": "张健的洞察：用户天然把升级理解成「补差价」，我们的技术是「先买后退」——所有升配相关话术都要按用户心智设计，不是按实现逻辑。",
       "projectHint": "升配",
-      "source": "会议逐字稿·188859509"
+      "source": "会议逐字稿·188859509",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "insp-150872294-1",
       "id": "insp-150872294-1",
       "text": "张娱的方法论：散点反馈必须收敛成规则化处理，不能天天让研发单点查日志；工具化 + 定量化是关键（比如「消耗超过 X 积分自动预警」）。",
       "projectHint": "积分",
-      "source": "会议逐字稿·150872294"
+      "source": "会议逐字稿·150872294",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "insp-150872294-2",
       "id": "insp-150872294-2",
       "text": "「退套餐」≠「退积分」，混着处理会影响商业化数据 → 客服 SOP 需要按诉求类型分流，退套餐走商业化审批、退积分走技术侧诊断。",
       "projectHint": "积分",
-      "source": "会议逐字稿·150872294"
+      "source": "会议逐字稿·150872294",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "insp-666508522-1",
       "id": "insp-666508522-1",
       "text": "排查思路：先查「数据变没变」（资源包/退费额度），再查「上报有没有」（日志）→ 是所有异常问题的通用漏斗，可沉淀成客服/研发的排查 checklist。",
       "projectHint": "升配",
-      "source": "会议逐字稿·666508522"
+      "source": "会议逐字稿·666508522",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "insp-269703744-1",
       "id": "insp-269703744-1",
       "text": "「状态语义」和「提示语义」应分离：状态给用户看历史（已作废），提示给用户看结果（无可用金额）。以后所有涉及「用户看到状态却不能操作」的场景都可复用此原则。",
       "projectHint": "订单与发票",
-      "source": "会议逐字稿·269703744"
+      "source": "会议逐字稿·269703744",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "insp-162470097-1",
       "id": "insp-162470097-1",
       "text": "线下 SOP 已有的规则（金额 0 元也走退货不退款），线上产品能力却没有 → 说明「线下运营手册」和「产品能力清单」应该主动定期同步，避免同类漏洞反复暴露。",
       "projectHint": "升配",
-      "source": "会议逐字稿·162470097"
+      "source": "会议逐字稿·162470097",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "insp-493967419-1",
       "id": "insp-493967419-1",
       "text": "短期「串行改并行」不消除闪烁但降低用户感知——先减弱再消除，是所有渐进式体验优化的通用节奏。",
       "projectHint": "软件页",
-      "source": "会议逐字稿·493967419"
+      "source": "会议逐字稿·493967419",
+      "projectId": "proj-game-homepage-weaknet"
     },
     {
       "serverSyncId": "insp-754489105-1",
       "id": "insp-754489105-1",
       "text": "「等价交换 vs 诱骗」是判断商业化健康度的一把尺——短期数据好看的策略如果本质是诱骗，不该追。用户注意力有阈值（10→20 有增益，30 后失效），要用数据找最优点，不是拍脑袋堆。",
       "projectHint": "商业化",
-      "source": "会议逐字稿·754489105"
+      "source": "会议逐字稿·754489105",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "insp-754489105-2",
       "id": "insp-754489105-2",
       "text": "「假设驱动实验」是方法论核心：先假设、后实验、再解读——没有假设的数据无法判断好坏，也无法沉淀方法论。",
       "projectHint": "方法论",
-      "source": "会议逐字稿·754489105"
+      "source": "会议逐字稿·754489105",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "insp-416533737-1",
       "id": "insp-416533737-1",
       "text": "「已有数据」和「已进看板」是两件事：需要主动清点哪些数据散在临时 AB 里未上看板，否则总是「用时找不到」。这个原则对所有数据类项目都适用。",
       "projectHint": "数据看板",
-      "source": "会议逐字稿·416533737"
+      "source": "会议逐字稿·416533737",
+      "projectId": "proj-game-heatmap"
     },
     {
       "serverSyncId": "insp-369169463-1",
       "id": "insp-369169463-1",
       "text": "改版一次性上「大版本」很难归因收益——拆成最小子需求做小实验，每个实验前先做数据预估，才能算清每一步改动值不值。此原则可推广到任何 UI 改版类项目。",
       "projectHint": "更新页游戏板块",
-      "source": "会议逐字稿·369169463"
+      "source": "会议逐字稿·369169463",
+      "projectId": "proj-update-game-block"
     },
     {
       "serverSyncId": "insp-369169463-2",
       "id": "insp-369169463-2",
       "text": "「聚焦时长(focus)」比「下载时长」更能反映用户真实关注度——评价指标要过滤掉网速这类无关变量。凡是「用时间衡量注意力」的场景都可以复用这个原则。",
       "projectHint": "更新页游戏板块",
-      "source": "会议逐字稿·369169463"
+      "source": "会议逐字稿·369169463",
+      "projectId": "proj-update-game-block"
     },
     {
       "serverSyncId": "insp-369169463-3",
       "id": "insp-369169463-3",
       "text": "「关闭窗口/异常退出」的数据兜底：由客户端在关键节点（如最后一款软件安装完成）主动上报一次，避免因用户异常操作丢失数据。所有涉及「进程内埋点」的场景都要想这个兜底。",
       "projectHint": "更新页游戏板块",
-      "source": "会议逐字稿·369169463"
+      "source": "会议逐字稿·369169463",
+      "projectId": "proj-update-game-block"
     },
     {
       "serverSyncId": "insp-779912090-1",
       "id": "insp-779912090-1",
       "text": "【张健方法论】判断需求要不要做的逻辑：先判断「用户真的需要吗」→ 决定做；不能倒过来「竞品都做了 → 我们也做」。竞品是「顾虑参考」，不是「结论依据」。",
       "projectHint": "方法论",
-      "source": "会议逐字稿·779912090"
+      "source": "会议逐字稿·779912090",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "insp-779912090-2",
       "id": "insp-779912090-2",
       "text": "「机械执行 vs 主动思考」：拉某人参会前要想清楚这人的作用；找某人对齐前要想清楚要拿到什么答案。拉了人不发言=没拉，等着对方回复=没方案。",
       "projectHint": "方法论",
-      "source": "会议逐字稿·779912090"
+      "source": "会议逐字稿·779912090",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "insp-779912090-3",
       "id": "insp-779912090-3",
       "text": "需求 = 功能 + 配套动作 + 数据依赖 + 人员协作 —— 只做「功能」是缺胳膊少腿的需求；配套上不了线，功能也白搭。",
       "projectHint": "方法论",
-      "source": "会议逐字稿·779912090"
+      "source": "会议逐字稿·779912090",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "insp-587482601-1",
       "id": "insp-587482601-1",
       "text": "AI 生成的测试用例最爱做「过度设计」（后台全挂/回调异常）—— 有勇气砍掉概率极低的兜底场景，把精力放在真实高频路径。",
       "projectHint": "方法论",
-      "source": "会议逐字稿·587482601"
+      "source": "会议逐字稿·587482601",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "insp-343216730-1",
       "id": "insp-343216730-1",
       "text": "AI 生成用例的通病：想「区分主端/网页端」但没区分开，还会造成场景重叠 —— 产品要先按「用户改动点」重构结构再交测试，别丢给测试自己理。",
       "projectHint": "方法论",
-      "source": "会议逐字稿·343216730"
+      "source": "会议逐字稿·343216730",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "insp-175481386-1",
       "id": "insp-175481386-1",
       "text": "「设计稿写非必填但后端强制校验」是最常见跨端 bug —— 发版前产品要亲跑一遍关键路径核对，不能只信 UI 走查。",
       "projectHint": "订单与发票",
-      "source": "会议逐字稿·175481386"
+      "source": "会议逐字稿·175481386",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "insp-647521797-1",
       "id": "insp-647521797-1",
       "text": "「让用户点了才知道不行」是体验大忌 —— 状态判断能在列表阶段做的，就绝不推迟到操作阶段。凡是 CTA 点击后才提示的失败态，都是 UX 债。",
       "projectHint": "订单与发票",
-      "source": "会议逐字稿·647521797"
+      "source": "会议逐字稿·647521797",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "insp-647521797-2",
       "id": "insp-647521797-2",
       "text": "「重新开票路径 vs 普通开票路径」是同业务两个技术分支 —— 前端很容易只补一处漏另一处，凡分支路径都要列 checklist 走查。",
       "projectHint": "订单与发票",
-      "source": "会议逐字稿·647521797"
+      "source": "会议逐字稿·647521797",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "insp-297383994-1",
       "id": "insp-297383994-1",
       "text": "跨集团配合最贵的成本是「拨错人」—— 需求前先确认自己的开票/退票主体归属，别按 ID 或猜测就拉人开会。",
       "projectHint": "订单与发票",
-      "source": "会议逐字稿·297383994"
+      "source": "会议逐字稿·297383994",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "insp-695756060-1",
       "id": "insp-695756060-1",
       "text": "「用户输入字段 vs 用户能获取信息」是两件事 —— 红字确认单号我们只是填入方，责任在购方；产品要为用户提供获取指引，别以为「有字段=用户懂」。",
       "projectHint": "订单与发票",
-      "source": "会议逐字稿·695756060"
+      "source": "会议逐字稿·695756060",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "insp-699123528-1",
       "id": "insp-699123528-1",
       "text": "「跟着版本节奏拆需求」比「等所有需求 ready 一起上」更经济 —— 小需求（QA list、续费提示）搭主线版本一起上，是资源利用最优解。",
       "projectHint": "方法论",
-      "source": "会议逐字稿·699123528"
+      "source": "会议逐字稿·699123528",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "insp-356937698-1",
       "id": "insp-356937698-1",
       "text": "【江驰方法论】先把数据量做小（阈值+时间窗）再做自动化 —— 否则「几百条数据没人会看」，产品和研发都会放弃这条链路。规则打磨优先于自动化搬运。",
       "projectHint": "积分",
-      "source": "会议逐字稿·356937698"
+      "source": "会议逐字稿·356937698",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "insp-356937698-2",
       "id": "insp-356937698-2",
       "text": "「已有数据」和「一个 DB」是两码事：积分消耗和异常扫描不在同一数据源，排序要看能不能同表查，跨表查就要绕。产品设计字段前先问清楚 DB 层。",
       "projectHint": "积分",
-      "source": "会议逐字稿·356937698"
+      "source": "会议逐字稿·356937698",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "insp-356937698-3",
       "id": "insp-356937698-3",
       "text": "AI 评估流程 = ①执行 ②留档 ③人工复核 ④反馈 —— 第②和第④步产品最容易忘。「AI 判过就完事」= 无法沉淀规则，无法优化模型。",
       "projectHint": "积分",
-      "source": "会议逐字稿·356937698"
+      "source": "会议逐字稿·356937698",
+      "projectId": "proj-credit-refund"
     },
     {
       "serverSyncId": "insp-356937698-4",
       "id": "insp-356937698-4",
       "text": "「对话内容」是用户能看到的、「trace user query」是研发能看到的 —— 产品文案/字段选择要按用户视角，不按底层视角，否则用户看不懂等于看不到。",
       "projectHint": "方法论",
-      "source": "会议逐字稿·356937698"
+      "source": "会议逐字稿·356937698",
+      "projectId": "proj-game-homepage-revamp"
     },
     {
       "serverSyncId": "insp-253354960-1",
       "id": "insp-253354960-1",
       "text": "「视觉差异化」是最便宜的渠道运营钩子 —— 不改产品能力、只改样式，几乎不侵入主链路，可用于渠道 A/B 或渠道归属识别。",
       "projectHint": "推荐",
-      "source": "会议逐字稿·253354960"
+      "source": "会议逐字稿·253354960",
+      "projectId": "proj-invoice"
     },
     {
       "serverSyncId": "insp-802368537-1",
       "id": "insp-802368537-1",
       "text": "「找计费借费退款」= 短平快但不合规；「人工调接口」= 合规且快 —— 面对处理时长压力时，优先合规而不是路径最短。",
       "projectHint": "升配",
-      "source": "会议逐字稿·802368537"
+      "source": "会议逐字稿·802368537",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "insp-802368537-2",
       "id": "insp-802368537-2",
       "text": "偶现问题要区分「代码 bug」还是「下游依赖抖动」—— 前者要修，后者要有告警和人工兜底。别把下游抖动误当代码 bug 反复排查。",
       "projectHint": "升配",
-      "source": "会议逐字稿·802368537"
+      "source": "会议逐字稿·802368537",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "insp-740899701-1",
       "id": "insp-740899701-1",
       "text": "「用接口替代人工线下操作」是效率飞跃（1天→几分钟）—— 但要为接口设置权限和审计，别为了快牺牲可追溯性。",
       "projectHint": "升配",
-      "source": "会议逐字稿·740899701"
+      "source": "会议逐字稿·740899701",
+      "projectId": "proj-upgrade"
     },
     {
       "serverSyncId": "insp-740899701-2",
       "id": "insp-740899701-2",
       "text": "分层复用：升配退订 = 解绑关联 + 常规退订，避免重复实现「特殊退订流程」，让升配退款和普通退款走同一套代码路径 —— 减少 bug 面。",
       "projectHint": "升配",
-      "source": "会议逐字稿·740899701"
+      "source": "会议逐字稿·740899701",
+      "projectId": "proj-upgrade"
     }
-  ]
+  ],
+  "schemaVersion": 2
 }
