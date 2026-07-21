@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-19 23:46",
+  "generatedAt": "2026-07-21 10:37",
   "sourceHint": "已按「王艺菱主责 + PC 电管板块」重构：3 独立业务 + 6 PC 电管项目 + 会议重新归类",
   "projects": [
     {
@@ -807,6 +807,63 @@
       ],
       "rawContent": "详见本地归档 逐字稿归档/2026-07-10_740899701_yilingwang的快速会议.md",
       "projectId": "proj-upgrade"
+    },
+    {
+      "serverSyncId": "sum-544192681",
+      "id": "sum-544192681",
+      "title": "玩游戏首页热力图实现方案讨论",
+      "description": "来源：腾讯会议 544192681（2026-07-20 15:39）。与吴云龙讨论热力图技术方案：所见即所得（在线页面追加参数），独立页面渲染，及新老平台归属决策。",
+      "syncedAt": "2026-07-20 16:39",
+      "meetingCode": "544192681",
+      "completedItems": [
+        "对齐核心需求：动态、与现有面板切合的热力图看板；右侧数据可由 AI 分析数据源生成，降低研发成本",
+        "技术方案定调：采用「所见即所得」——在线上真实页面追加参数显示热力图数据，可解决动态更新+AB/环境差异",
+        "热力图作为独立页面渲染，根据实际加载页面内容（如精选小游戏）抓取后台数据",
+        "平台归属分歧：沙舟建议一劳永逸放新平台；云龙提示新平台还在技术方案/demo 阶段，需等待"
+      ],
+      "todoItems": [
+        "王艺菱：整理热力图现状、需求详情、需求目的、验收标准",
+        "整理完拉徐瑞 + 云龙再聊一轮，明确页面归属新平台还是老平台",
+        "右侧数据是否要做：如需要则逐项明确数据来源和用途，再决定研发工作量"
+      ],
+      "insights": [
+        "「所见即所得」比自建独立看板更省——追加参数复用线上页面，天然解决 AB/环境/动态更新问题",
+        "「一劳永逸放新平台」很诱人，但要评估「新平台还在 demo 阶段」的等待成本——不要为了长远牺牲短期能力交付",
+        "有数据源就丢给 AI 分析，减少研发投入——这是「AI-first 产品思维」在数据看板类项目的落点"
+      ],
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-20_544192681_yilingwang的快速会议.md",
+      "projectId": "proj-game-heatmap"
+    },
+    {
+      "serverSyncId": "sum-178246550",
+      "id": "sum-178246550",
+      "title": "升配退订异常订单排查与退款处理",
+      "description": "来源：腾讯会议 178246550（2026-07-20 15:07）。原套餐积分耗尽后升配导致退订异常，接口已优化；4 笔已发生的异常订单走磐石退款流程逐单处理。",
+      "syncedAt": "2026-07-20 16:07",
+      "meetingCode": "178246550",
+      "completedItems": [
+        "定位根因：计量接口不支持「套餐积分耗尽后仍可退订」，已于上周五发布优化，四天未再复现",
+        "已发生异常订单临时方案：由王艺菱手动执行「退货不退款」（正常退货退款流程会报错）",
+        "跨周末产生自动续费的订单：资源已销毁但钱未退，撤回原退款操作 → 重新申请正常退款",
+        "确认前三个订单为升配后续费产生的 29 元订单，第四个订单为 7/15 新购 69 元，资源已用尽",
+        "用量核查结论：前两个续费订单未使用（余量约 1000）→ 全额退款；第三个续费订单已用尽 → 不退款；第四个新购订单已用尽 → 不退款，只关自动续费",
+        "退款执行：waynezzhu（朱万荣）通过磐石退款流程（退款不退货）处理，需要提供新购单号+资源ID"
+      ],
+      "todoItems": [
+        "朱万荣：对前两个续费订单（29 元/单）执行全额退款，并在群内同步结果",
+        "关闭四个订单的自动续费（已销毁资源不会再次续费，第四单需手动关闭）",
+        "王艺菱：观察后续是否还有类似升配退订异常，接口优化四天未复现暂视为闭环",
+        "沉淀：把「升配退订异常 → 磐石退款不退货 + 用量核查决定退多少」流程写进客服/PM SOP"
+      ],
+      "insights": [
+        "计量接口不支持「套餐耗尽后退订」是典型「隐藏边界」——升配这类涉及旧订单状态的功能，必须显式列出所有旧订单状态（含积分耗尽），逐一验证是否可退",
+        "「审批期跨周末产生自动续费」是流程死角——涉及退款/退货类审批要考虑「审批时长 vs 续费扣费」窗口，避免钱货两清后再反悔",
+        "「退货不退款」+「退款不退货」两条磐石路径要在客服 SOP 里区分清楚——不同场景走不同接口，用错会数据错乱",
+        "接口优化 vs 存量订单处理是两条独立路径——修 bug 只是止损，历史脏数据要单独走磐石人工流程",
+        "用量核查决定退款金额（未用=全退、已用尽=不退、部分用=按剩余额度）是一套通用规则，可标准化"
+      ],
+      "rawContent": "详见本地归档 逐字稿归档/2026-07-20_178246550_yilingwang的快速会议.md",
+      "projectId": "proj-upgrade"
     }
   ],
   "tasks": [
@@ -1412,6 +1469,78 @@
       "quadrant": "urgent-important",
       "source": "meeting-740899701",
       "projectId": "proj-upgrade"
+    },
+    {
+      "serverSyncId": "task-544192681-1",
+      "text": "整理热力图现状/需求详情/需求目的/验收标准，为下一次跨方评审做输入",
+      "projectHint": "数据看板",
+      "priority": "高",
+      "quadrant": "urgent-important",
+      "source": "meeting-544192681",
+      "projectId": "proj-game-heatmap"
+    },
+    {
+      "serverSyncId": "task-544192681-2",
+      "text": "拉徐瑞 + 云龙再聊一轮，明确热力图页面归属新平台还是老平台",
+      "projectHint": "数据看板",
+      "priority": "高",
+      "quadrant": "important-not-urgent",
+      "source": "meeting-544192681",
+      "projectId": "proj-game-heatmap"
+    },
+    {
+      "serverSyncId": "task-544192681-3",
+      "text": "判断右侧数据是否要研发做——若要，则逐项明确数据来源/用途，否则丢 AI 分析",
+      "projectHint": "数据看板",
+      "priority": "中",
+      "quadrant": "important-not-urgent",
+      "source": "meeting-544192681",
+      "projectId": "proj-game-heatmap"
+    },
+    {
+      "serverSyncId": "task-178246550-1",
+      "text": "朱万荣对前两个续费订单（29 元/单）执行全额退款，并在群内同步结果",
+      "projectHint": "升配",
+      "priority": "高",
+      "quadrant": "urgent-important",
+      "source": "meeting-178246550",
+      "projectId": "proj-upgrade"
+    },
+    {
+      "serverSyncId": "task-178246550-2",
+      "text": "关闭四个订单的自动续费（第四单已销毁资源需手动关自动续费）",
+      "projectHint": "升配",
+      "priority": "高",
+      "quadrant": "urgent-important",
+      "source": "meeting-178246550",
+      "projectId": "proj-upgrade"
+    },
+    {
+      "serverSyncId": "task-178246550-3",
+      "text": "观察接口优化后是否还有升配退订异常复现（当前已四天未复现）",
+      "projectHint": "升配",
+      "priority": "中",
+      "quadrant": "important-not-urgent",
+      "source": "meeting-178246550",
+      "projectId": "proj-upgrade"
+    },
+    {
+      "serverSyncId": "task-178246550-4",
+      "text": "把「升配退订异常 → 磐石退款不退货 + 用量核查决定退款金额」写进客服/PM SOP",
+      "projectHint": "升配",
+      "priority": "高",
+      "quadrant": "important-not-urgent",
+      "source": "meeting-178246550",
+      "projectId": "proj-upgrade"
+    },
+    {
+      "serverSyncId": "task-178246550-5",
+      "text": "梳理升配涉及的所有旧订单状态（含积分耗尽），逐一验证是否可退，避免隐藏边界",
+      "projectHint": "升配",
+      "priority": "中",
+      "quadrant": "important-not-urgent",
+      "source": "meeting-178246550",
+      "projectId": "proj-upgrade"
     }
   ],
   "inspires": [
@@ -1701,6 +1830,70 @@
       "text": "分层复用：升配退订 = 解绑关联 + 常规退订，避免重复实现「特殊退订流程」，让升配退款和普通退款走同一套代码路径 —— 减少 bug 面。",
       "projectHint": "升配",
       "source": "会议逐字稿·740899701",
+      "projectId": "proj-upgrade"
+    },
+    {
+      "serverSyncId": "insp-544192681-1",
+      "id": "insp-544192681-1",
+      "text": "「所见即所得」是数据看板类项目的最佳偷懒——直接在线上真实页面追加参数显示数据，比自建看板天然解决 AB/环境差异/动态更新三大痛点。",
+      "projectHint": "数据看板",
+      "source": "会议逐字稿·544192681",
+      "projectId": "proj-game-heatmap"
+    },
+    {
+      "serverSyncId": "insp-544192681-2",
+      "id": "insp-544192681-2",
+      "text": "「有数据源就丢给 AI 分析」是「AI-first 产品思维」的落点——不用为每个分析维度都投入研发，把 AI 当默认可用的通用分析引擎。",
+      "projectHint": "方法论",
+      "source": "会议逐字稿·544192681",
+      "projectId": "proj-game-homepage-revamp"
+    },
+    {
+      "serverSyncId": "insp-544192681-3",
+      "id": "insp-544192681-3",
+      "text": "「一劳永逸放新平台」和「新平台还在 demo 阶段」的取舍——不要为了长远收益牺牲短期能力交付，要评估等待成本。",
+      "projectHint": "方法论",
+      "source": "会议逐字稿·544192681",
+      "projectId": "proj-game-homepage-revamp"
+    },
+    {
+      "serverSyncId": "insp-178246550-1",
+      "id": "insp-178246550-1",
+      "text": "计量接口「不支持套餐耗尽后退订」是典型的「隐藏边界」——涉及旧订单状态的功能，必须显式列出所有旧订单状态（含积分耗尽/资源销毁/已抵扣），逐一验证是否可退。",
+      "projectHint": "升配",
+      "source": "会议逐字稿·178246550",
+      "projectId": "proj-upgrade"
+    },
+    {
+      "serverSyncId": "insp-178246550-2",
+      "id": "insp-178246550-2",
+      "text": "「审批期跨周末产生自动续费」是流程死角——涉及退款/退货审批要考虑「审批时长 vs 续费扣费」窗口，钱货两清后反悔的处理成本远高于事前规避。",
+      "projectHint": "升配",
+      "source": "会议逐字稿·178246550",
+      "projectId": "proj-upgrade"
+    },
+    {
+      "serverSyncId": "insp-178246550-3",
+      "id": "insp-178246550-3",
+      "text": "「退货不退款」+「退款不退货」两条磐石路径不同场景走不同接口——客服 SOP 必须区分清楚，用错会数据错乱。",
+      "projectHint": "升配",
+      "source": "会议逐字稿·178246550",
+      "projectId": "proj-upgrade"
+    },
+    {
+      "serverSyncId": "insp-178246550-4",
+      "id": "insp-178246550-4",
+      "text": "「接口优化 vs 存量脏数据处理」是两条独立路径——修 bug 只是止损未来，历史脏数据要单独走磐石人工流程，别把「已修复」当「一切正常」。",
+      "projectHint": "升配",
+      "source": "会议逐字稿·178246550",
+      "projectId": "proj-upgrade"
+    },
+    {
+      "serverSyncId": "insp-178246550-5",
+      "id": "insp-178246550-5",
+      "text": "用量核查决定退款金额是一套通用规则：未用=全退、已用尽=不退、部分用=按剩余额度——可标准化成客服判断树，减少每单沟通成本。",
+      "projectHint": "升配",
+      "source": "会议逐字稿·178246550",
       "projectId": "proj-upgrade"
     }
   ],
