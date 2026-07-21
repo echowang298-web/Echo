@@ -944,6 +944,23 @@
             renderProjects();
         }
 
+        function deleteProject(projectId) {
+            const project = board.projects.find(p => p.id === projectId);
+            if (!project) return;
+            const taskCount = (project.tasks || []).length;
+            const msg = `确定删除项目「${project.name}」？\n${taskCount > 0 ? `该下有 ${taskCount} 条待办，会一并删除。` : ''}\n此操作不可撤销。`;
+            if (!confirm(msg)) return;
+            // 删除项目及其任务
+            board.projects = board.projects.filter(p => p.id !== projectId);
+            // 清理折叠状态
+            const set = getProjectCollapsedSet();
+            set.delete(`__EXPAND__${projectId}`);
+            saveProjectCollapsedSet(set);
+            saveBoard();
+            showToast(`已删除项目「${project.name}」`);
+            renderProjects();
+        }
+
         function renderProjects() {
             const container = document.getElementById('projects-container');
             if (board.projects.length === 0) {
@@ -976,6 +993,7 @@
                                 </div>
                             </div>
                             <button onclick="toggleProjectCollapse('${escapeHtml(project.id)}')" title="展开查看详情" class="shrink-0 text-xs text-slate-400 hover:text-slate-700 px-2 py-1 rounded-lg hover:bg-slate-50 transition">▼ 展开</button>
+                            <button onclick="deleteProject('${escapeHtml(project.id)}')" title="删除项目" class="shrink-0 text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 transition">✕ 删除</button>
                         </div>
                     </section>`;
                 }
@@ -1000,6 +1018,7 @@
                                     <h3 class="text-2xl font-black text-slate-900">${escapeHtml(project.name)}</h3>
                                     <span class="px-3 py-1 rounded-full text-xs font-bold border ${getStatusBadge(project.status)}">${escapeHtml(project.status)}</span>
                                     ${collapseButton}
+                                    <button onclick="deleteProject('${escapeHtml(project.id)}')" title="删除此项目" class="shrink-0 text-xs text-red-300 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 transition">✕ 删除</button>
                                 </div>
                                 <p class="text-sm text-slate-500 mt-3 leading-7">${escapeHtml(project.summary || '')}</p>
                                 ${infoBadges ? `<div class="mt-4 flex flex-wrap gap-2">${infoBadges}</div>` : ''}
